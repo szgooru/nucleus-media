@@ -10,8 +10,5 @@ public class ConfigConstants {
   public static final String MAX_FILE_SIZE = "max.file.size";
   
   public static final String UPLOAD_LOCATION = "upload.location";
-
-  public static final String GOORU_BUCKET = "file.upload.bucket";
   
-
 }

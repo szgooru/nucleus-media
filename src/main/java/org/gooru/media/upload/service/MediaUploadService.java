@@ -6,6 +6,4 @@ public interface MediaUploadService {
 
   String uploadFile(RoutingContext routingContext, String existingFileName);
   
-  String uploadFileS3(String sourceFilePath, String contentId);
-  
 }

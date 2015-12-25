@@ -12,12 +12,6 @@ import io.vertx.ext.web.RoutingContext;
 public class MediaUploadServiceImpl implements MediaUploadService{
 
   static final Logger LOG = LoggerFactory.getLogger(MediaUploadServiceImpl.class);
-
-  private S3Service s3Service;
-  
-  public  MediaUploadServiceImpl() {
-    this.setS3Service(new S3Service());
-  }
   
   @Override
   public String uploadFile(RoutingContext context, String existingFileName){
@@ -32,23 +26,4 @@ public class MediaUploadServiceImpl implements MediaUploadService{
     }
     return json.toString();
   }
-
-  @Override
-  public String uploadFileS3(String sourceFilePath, String contentId){
-    try {
-      return getS3Service().uploadFileS3(sourceFilePath, contentId);
-    } catch (Exception e) {
-        LOG.error("Failed to upload file to s3 : ", e);
-     }
-    return null;
-  }
-  
-  public S3Service getS3Service() {
-    return s3Service;
-  }
-
-  public void setS3Service(S3Service s3Service) {
-    this.s3Service = s3Service;
-  }
-
 }

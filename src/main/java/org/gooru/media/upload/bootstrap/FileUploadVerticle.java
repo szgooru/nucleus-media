@@ -7,6 +7,7 @@ import org.gooru.media.upload.constants.RouteConstants;
 import org.gooru.media.upload.exception.FileUploadRuntimeException;
 import org.gooru.media.upload.service.MediaUploadService;
 import org.gooru.media.upload.service.MediaUploadServiceImpl;
+import org.gooru.media.upload.service.S3Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,8 @@ public class FileUploadVerticle extends AbstractVerticle {
  
   private  MediaUploadService uploadService;
   
+  private S3Service s3Service;
+  
   @Override
   public void start() throws Exception {
     
@@ -36,7 +39,8 @@ public class FileUploadVerticle extends AbstractVerticle {
     final long bodyLimit = config().getLong(ConfigConstants.MAX_FILE_SIZE);
     final String uploadLocation = config().getString(ConfigConstants.UPLOAD_LOCATION);
     uploadService = new MediaUploadServiceImpl();
-
+    s3Service = new S3Service();
+    
     BodyHandler bodyHandler = BodyHandler.create();
     bodyHandler.setBodyLimit(bodyLimit);
     bodyHandler.setUploadsDirectory(uploadLocation);
@@ -88,7 +92,12 @@ public class FileUploadVerticle extends AbstractVerticle {
       String sourceFilePath = context.request().getParam(RouteConstants.FILE_ID);
       String contentId = context.request().getParam(RouteConstants.CONTENT_ID);
       if(sourceFilePath != null && contentId != null){
-        uploadService.uploadFileS3(sourceFilePath, contentId);
+        try{
+          s3Service.uploadFileS3(sourceFilePath, contentId);
+        }
+        catch(Exception e){
+          context.fail(e);
+        }
       }
       else{
         context.fail(new FileUploadRuntimeException(HttpConstants.HttpStatus.BAD_REQUEST.getMessage(), HttpConstants.HttpStatus.BAD_REQUEST.getCode()));
