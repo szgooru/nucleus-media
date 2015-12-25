@@ -2,7 +2,9 @@ package org.gooru.media.upload.bootstrap;
 
 
 import org.gooru.media.upload.constants.ConfigConstants;
+import org.gooru.media.upload.constants.HttpConstants;
 import org.gooru.media.upload.constants.RouteConstants;
+import org.gooru.media.upload.exception.FileUploadRuntimeException;
 import org.gooru.media.upload.service.MediaUploadService;
 import org.gooru.media.upload.service.MediaUploadServiceImpl;
 import org.slf4j.Logger;
@@ -42,35 +44,56 @@ public class FileUploadVerticle extends AbstractVerticle {
     
     router.route().failureHandler(failureRoutingContext -> {
       int statusCode = failureRoutingContext.statusCode();
-      if(statusCode != -1){
-        // If upload fails we need to delete file from the uploaded location 
-        for (FileUpload f : failureRoutingContext.fileUploads()) {
-             uploadService.deleteFile(vertx, f.uploadedFileName());
-        }
-        
-        //TODO : have to add logic to send error message and code in json format 
-        HttpServerResponse response = failureRoutingContext.response();
-        response.setStatusCode(statusCode);
-        response.end();
+      LOG.info( "Route failed : " + failureRoutingContext.request().absoluteURI() +  "  Cause : "+failureRoutingContext.failure().getMessage()  + " Status code: " + statusCode);
+      if(statusCode == HttpConstants.HttpStatus.TOO_LARGE.getCode()){
+         // If upload fails we need to delete file from the uploaded location 
+         for (FileUpload f : failureRoutingContext.fileUploads()) {
+           String fileName = f.uploadedFileName();
+           vertx.fileSystem().delete(fileName, result -> {
+             if(result.failed()){
+               LOG.warn("Delete of file '{}' failed cause '{}' ", fileName, result.cause());         
+             }
+             else {
+               LOG.debug("Delete of file '{}' succeeded", fileName);         
+             }
+            });
+         }
       }
-      else{
-        failureRoutingContext.next();
-      }
+      //TODO : have to add logic to send error message and code in json format 
+      HttpServerResponse response = failureRoutingContext.response();
+      response.setStatusCode(statusCode);
+      response.end();
     });
    
     // upload file  
     router.post(RouteConstants.EP_FILE_UPLOAD).handler(context -> {
       String existingFname = context.request().getParam(RouteConstants.EXISTING_FILE_NAME);
-      String response = uploadService.uploadFile(vertx, context, uploadLocation + existingFname);
-      LOG.info("Status code : " + context.response().getStatusCode());
+      String response = uploadService.uploadFile(context, uploadLocation + existingFname);
+      if(existingFname != null && !existingFname.isEmpty()){
+        vertx.fileSystem().delete(existingFname, result -> {
+          if(result.failed()){
+            LOG.warn("Delete of file '{}' failed cause '{}' ", existingFname, result.cause());         
+          }
+          else {
+            LOG.debug("Delete of file '{}' succeeded", existingFname);         
+          }
+        });
+      }
+      LOG.info("Request URL : " + context.request().absoluteURI() + "  " + context.response().getStatusCode());
       context.response().end(response);
     });
      
     // move file to s3 
     router.put(RouteConstants.EP_FILE_UPLOAD_S3).handler(context -> {
-      // TODO : have to add logic to move file from filesystem to s3 repo
+      String sourceFilePath = context.request().getParam(RouteConstants.FILE_ID);
+      String contentId = context.request().getParam(RouteConstants.CONTENT_ID);
+      if(sourceFilePath != null && contentId != null){
+        uploadService.uploadFileS3(sourceFilePath, contentId);
+      }
+      else{
+        context.fail(new FileUploadRuntimeException(HttpConstants.HttpStatus.BAD_REQUEST.getMessage(), HttpConstants.HttpStatus.BAD_REQUEST.getCode()));
+      }
     });
-    
     
     // If the port is not present in configuration then we end up
     // throwing as we are casting it to int. This is what we want.
