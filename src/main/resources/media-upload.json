@@ -1,6 +1,8 @@
 {
   "comment" : "This is bundled JSON file. Idea is that we should externalize this also as part of build. Currently this is going to hold the dev env information",
   "http.port" : 8080,
-  "max.file.size" : 5242880,
-  "upload.location" : "/home/parthiban/media-upload/"
+  "max.file.size.bytes" : 5242880,
+  "upload.location" : "/home/parthiban/media-upload/",
+  "s3.config.file.location":"/home/parthiban/s3props.txt",
+  "s3.host":"test-content-bucket01.s3.amazonaws.com"
 }
