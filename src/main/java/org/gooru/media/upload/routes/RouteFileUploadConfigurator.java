@@ -11,10 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.DeliveryOptions;
-import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.FileUpload;
@@ -30,20 +26,16 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
 
   @Override
   public void configureRoutes(Vertx vertx, Router router, JsonObject config) {
-    
-    EventBus eb = vertx.eventBus();
     uploadService = new MediaUploadServiceImpl();
     final String s3ConfiFileLocation = config.getString(ConfigConstants.S3_CONFIG_FILE_LOCATION);
-    final String s3Host = config.getString(ConfigConstants.S3_HOST);
     final String uploadLocation = config.getString(ConfigConstants.UPLOAD_LOCATION);
     S3Service.setS3Config(s3ConfiFileLocation);
-    s3Service = new S3Service(createS3HttpClient(vertx, s3Host));
-
+    s3Service = new S3Service();
     
     // upload file to file system
     router.post(RouteConstants.EP_FILE_UPLOAD).handler(context -> {
        String existingFname = context.request().getParam(RouteConstants.EXISTING_FILE_NAME);
-       String response = uploadService.uploadFile(context, uploadLocation + existingFname);
+       String response = uploadService.uploadFile(context, uploadLocation);
        if(existingFname != null && !existingFname.isEmpty()){
          vertx.fileSystem().delete(existingFname, result -> {
            if(result.failed()){
@@ -60,21 +52,27 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
     
     // move file to s3 
     router.put(RouteConstants.EP_FILE_UPLOAD_S3).handler(context -> {
-      String sourceFilePath = context.request().getParam(RouteConstants.FILE_ID);
-      String contentId = context.request().getParam(RouteConstants.CONTENT_ID);
-      if(sourceFilePath != null && contentId != null){
-        try{
-              s3Service.uploadFileS3(uploadLocation + sourceFilePath, contentId);
-          
+      vertx.executeBlocking(future -> {
+        String fileName = context.request().getParam(RouteConstants.FILE_ID);
+        String contentId = context.request().getParam(RouteConstants.CONTENT_ID);
+        if(fileName != null && contentId != null){
+          try{
+            long start = System.currentTimeMillis();
+            s3Service.uploadFileS3(fileName, uploadLocation, contentId);
+            LOG.info("Elapsed time to complete upload file to s3 :" +(System.currentTimeMillis() - start) + " ms");
+            future.complete();
+          }
+          catch(Exception e){
+            context.fail(e);
+          }
         }
-        catch(Exception e){
-          context.fail(e);
+        else{
+          context.fail(new FileUploadRuntimeException(HttpConstants.HttpStatus.BAD_REQUEST.getMessage(), HttpConstants.HttpStatus.BAD_REQUEST.getCode()));
         }
-      }
-      else{
-        context.fail(new FileUploadRuntimeException(HttpConstants.HttpStatus.BAD_REQUEST.getMessage(), HttpConstants.HttpStatus.BAD_REQUEST.getCode()));
-      }
-      context.response().end();
+      }, res ->   {
+        System.out.println("Result " + res.succeeded());
+        context.response().end();
+      });
     });
 
     router.route().failureHandler(failureRoutingContext -> {
@@ -101,10 +99,6 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
     });
 
     
-  }
-  
-  private final HttpClient createS3HttpClient(Vertx vertx, String host){
-    return vertx.createHttpClient(new HttpClientOptions().setDefaultHost(host));
   }
 
 }

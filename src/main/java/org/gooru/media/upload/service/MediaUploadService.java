@@ -4,6 +4,6 @@ import io.vertx.ext.web.RoutingContext;
 
 public interface MediaUploadService {
 
-  String uploadFile(RoutingContext routingContext, String existingFileName);
+  String uploadFile(RoutingContext routingContext, String uploadLocation);
   
 }

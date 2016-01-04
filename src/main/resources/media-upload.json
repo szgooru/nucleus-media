@@ -4,5 +4,5 @@
   "max.file.size.bytes" : 5242880,
   "upload.location" : "/home/parthiban/media-upload/",
   "s3.config.file.location":"/home/parthiban/s3props.txt",
-  "s3.host":"test-content-bucket01.s3.amazonaws.com"
+  "s3.host":"s3-us-west-1.amazonaws.com"
 }

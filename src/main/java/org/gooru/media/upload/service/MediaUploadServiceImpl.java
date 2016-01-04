@@ -1,7 +1,9 @@
 package org.gooru.media.upload.service;
 
+import java.io.File;
 import java.util.Set;
 
+import org.gooru.media.upload.constants.FileUploadConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,16 +16,38 @@ public class MediaUploadServiceImpl implements MediaUploadService{
   static final Logger LOG = LoggerFactory.getLogger(MediaUploadServiceImpl.class);
   
   @Override
-  public String uploadFile(RoutingContext context, String existingFileName){
+  public String uploadFile(RoutingContext context, String uploadLocation){
     Set<FileUpload> files = context.fileUploads();
     if(LOG.isDebugEnabled()){
       LOG.debug("Context uploaded files : " + files.size());
     }
     JsonObject json = new JsonObject();
     for (FileUpload f : files) {
-      json.put("fileName", f.uploadedFileName());
       LOG.info("Orginal file name : "+ f.fileName() + " Uploaded file name in file system : " + f.uploadedFileName());
+      json.put("fileName", renameFile(f.fileName(), f.uploadedFileName()));
     }
     return json.toString();
+  }
+  
+  private String renameFile(String originalFileName, String uploadedFileName){
+    try{
+      // Get file extension 
+      int index = originalFileName.lastIndexOf(FileUploadConstants.DOT);
+      
+      if(index > 0){
+        String exten = originalFileName.substring(index+1);
+        File oldFile = new File(uploadedFileName);
+        File newFile = new File(uploadedFileName + FileUploadConstants.DOT + exten);
+        oldFile.renameTo(newFile);
+        uploadedFileName = newFile.getName();
+        LOG.info("Renamed file name : " + uploadedFileName);
+      }
+      
+    }
+    catch(Exception e){
+      LOG.error("Rename file name failed : " + e);
+    }
+    return uploadedFileName;
+    
   }
 }
