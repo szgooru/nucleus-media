@@ -54,11 +54,12 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
     router.put(RouteConstants.EP_FILE_UPLOAD_S3).handler(context -> {
       vertx.executeBlocking(future -> {
         String fileName = context.request().getParam(RouteConstants.FILE_ID);
-        String contentId = context.request().getParam(RouteConstants.CONTENT_ID);
-        if(fileName != null && contentId != null){
+        String contentId = context.request().getParam(RouteConstants.ENTITY_ID);
+        String entityType = context.request().getParam(RouteConstants.ENTITY_TYPE);
+        if(fileName != null && contentId != null && entityType != null){
           try{
             long start = System.currentTimeMillis();
-            s3Service.uploadFileS3(fileName, uploadLocation, contentId);
+            s3Service.uploadFileS3(fileName, uploadLocation, contentId, entityType);
             LOG.info("Elapsed time to complete upload file to s3 :" +(System.currentTimeMillis() - start) + " ms");
             future.complete();
           }
@@ -77,7 +78,7 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
 
     router.route().failureHandler(failureRoutingContext -> {
       int statusCode = failureRoutingContext.statusCode();
-      LOG.info( "Route failed : " + failureRoutingContext.request().absoluteURI() +  "  Cause : "+failureRoutingContext.failure().getMessage()  + " Status code: " + statusCode);
+      LOG.error( "Route failed : " + failureRoutingContext.request().absoluteURI() +  "  Cause : "+failureRoutingContext.failure().getMessage()  + " Status code: " + statusCode);
       if(statusCode == HttpConstants.HttpStatus.TOO_LARGE.getCode()){
          // If upload fails we need to delete file from the uploaded location 
          for (FileUpload f : failureRoutingContext.fileUploads()) {

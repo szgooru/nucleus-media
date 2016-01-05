@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 
@@ -23,6 +24,16 @@ public class FileUploadVerticle extends AbstractVerticle {
     final HttpServer httpServer = vertx.createHttpServer();
     
     final Router router = Router.router(vertx);
+    
+    DeploymentOptions options = new DeploymentOptions().setConfig(config());
+    
+    vertx.deployVerticle("org.gooru.media.upload.bootstrap.AuthVerticle", options, res -> {
+      if (res.succeeded()) {
+        LOG.info("Deploying AuthVerticle... " + res.result());
+      } else {
+        LOG.info("Deployment of AuthVerticle failed !");
+      }
+    });
     
     // Register the routes
     RouteConfiguration rc = new RouteConfiguration();

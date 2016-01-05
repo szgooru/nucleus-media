@@ -15,4 +15,6 @@ public class ConfigConstants {
 
   public static final String S3_HOST = "s3.host";
   
+  public static final String MBUS_TIMEOUT = "message.bus.send.timout.seconds";
+  
 }

@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.gooru.media.upload.constants.FileUploadConstants;
+import org.gooru.media.upload.constants.RouteConstants;
 import org.gooru.media.upload.constants.S3Constants;
 import org.jets3t.service.acl.AccessControlList;
 import org.jets3t.service.acl.GroupGrantee;
@@ -46,7 +47,7 @@ public class S3Service {
   public S3Service() {
     awsCredentials = new AWSCredentials(getS3Config(S3Constants.S3_ACCESS_KEY), getS3Config(S3Constants.S3_SECRET));
     restS3Service = new RestS3Service(awsCredentials);
-    LOG.info("accesskey : " + getS3Config(S3Constants.S3_ACCESS_KEY)  + " secret : " + getS3Config(S3Constants.S3_SECRET) + " bucket name : " + getS3Config(S3Constants.S3_BUCKET_NAME));
+    LOG.info("accesskey : " + getS3Config(S3Constants.S3_ACCESS_KEY)  + " secret : " + getS3Config(S3Constants.S3_SECRET));
   }
   
   public void setPublicACL(String objectKey, String gooruBucket) throws Exception {
@@ -57,13 +58,23 @@ public class S3Service {
     restS3Service.putObject(gooruBucket, fileObject);
   }
 
-  public void uploadFileS3(String fileName , String uploadLocation, String contentId) throws Exception{
+  public void uploadFileS3(String fileName , String uploadLocation, String contentId, String entityType) throws Exception{
     try{
       Path path = Paths.get(uploadLocation + fileName);
       byte[] data = Files.readAllBytes(path);
-      S3Object fileObject = new S3Object(contentId + FileUploadConstants.UNDERSCORE + fileName, data);
-      fileObject = restS3Service.putObject(getS3Config(S3Constants.S3_BUCKET_NAME), fileObject);
-      setPublicACL(contentId, getS3Config(S3Constants.S3_BUCKET_NAME));
+      String bucketName = getBucketName(entityType);
+      if(bucketName != null){
+        // Upload file to s3 
+        S3Object fileObject = new S3Object(contentId + FileUploadConstants.UNDERSCORE + fileName, data);
+        fileObject = restS3Service.putObject(bucketName, fileObject);
+        setPublicACL(contentId + FileUploadConstants.UNDERSCORE + fileName, bucketName);
+        
+        // Delete temp file after the s3 upload 
+        Files.deleteIfExists(path);
+      }
+      else {
+        throw new Exception("Entity type is invalid !");
+      }
     }
     catch(Exception e){
       LOG.error("Upload failed : " +e);
@@ -71,6 +82,17 @@ public class S3Service {
     }
   }
  
+  private String getBucketName(String entityType){
+    String bucketName = null;
+    if(entityType.equalsIgnoreCase(RouteConstants.UploadEntityType.CONTENT.name())){
+      bucketName = getS3Config(S3Constants.S3_CONTENT_BUCKET_NAME);
+    } 
+    else if(entityType.equalsIgnoreCase(RouteConstants.UploadEntityType.USER.name())){
+      bucketName = getS3Config(S3Constants.S3_USER_BUCKET_NAME);
+    }
+    return bucketName;
+  }
+  
   private static String getS3Config(String key){
     return props.getProperty(key);
   }

@@ -35,6 +35,7 @@ public class AuthVerticle extends AbstractVerticle {
 
       String msgOp = message.headers().get(MSG_HEADER_OP);
       String sessionToken = message.headers().get(MSG_HEADER_TOKEN);
+      LOGGER.info("Message received ! " + sessionToken);
       final DeliveryOptions deliveryOptions = new DeliveryOptions();
 
       if (sessionToken != null && !sessionToken.isEmpty()) {
@@ -42,6 +43,7 @@ public class AuthVerticle extends AbstractVerticle {
           redisClient.get(sessionToken, redisGetAsyncHandler -> {
             JsonObject result = null;
             if (redisGetAsyncHandler.succeeded()) {
+
               if (redisGetAsyncHandler.result() != null) {
                 result = new JsonObject(redisGetAsyncHandler.result());
                 deliveryOptions.addHeader(MSG_OP_STATUS, MSG_OP_STATUS_SUCCESS);
@@ -54,6 +56,7 @@ public class AuthVerticle extends AbstractVerticle {
               deliveryOptions.addHeader(MSG_OP_STATUS, MSG_OP_STATUS_ERROR);
             }
             message.reply(result, deliveryOptions);
+            
           });
         }
       } else {
