@@ -15,8 +15,8 @@ class AuthPrefsMessageBusJsonResponseHolder implements  AuthResponseHolder {
 
   public AuthPrefsMessageBusJsonResponseHolder(Message<Object> message) {
     this.message = message;
-    LOG.debug("Received response from Auth End point : {}", message.body().toString());
-    if (message != null) {
+    if (message != null && message.body() != null) {
+      LOG.debug("Received response from Auth End point : {}", message.body().toString());
       if (!(message.body() instanceof JsonObject)) {
         LOG.error("Message body is NOT JsonObject");
         throw new IllegalArgumentException("Message body should be initialized with JsonObject");

@@ -30,11 +30,10 @@ public class RouteConfiguration implements Iterable<RouteConfigurator> {
   
   public RouteConfiguration() {
     configurators = new ArrayList<RouteConfigurator>();
-    configurators.add(new RouteAuthConfigurator());
     configurators.add(new RouteGlobalConfigurator());
+    configurators.add(new RouteAuthConfigurator());
     configurators.add(new RouteFileUploadConfigurator());
     internalIterator = configurators.iterator();
   }
-
 
 }

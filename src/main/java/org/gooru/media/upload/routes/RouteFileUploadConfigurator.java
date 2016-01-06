@@ -52,6 +52,8 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
     
     // move file to s3 
     router.put(RouteConstants.EP_FILE_UPLOAD_S3).handler(context -> {
+      LOG.info("test log {} ", 1);
+      LOG.info("test log 2 ");
       vertx.executeBlocking(future -> {
         String fileName = context.request().getParam(RouteConstants.FILE_ID);
         String contentId = context.request().getParam(RouteConstants.ENTITY_ID);
@@ -95,7 +97,9 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
       }
       //TODO : have to add logic to send error message and code in json format 
       HttpServerResponse response = failureRoutingContext.response();
-      response.setStatusCode(statusCode);
+      if(statusCode != -1){
+        response.setStatusCode(statusCode);
+      }
       response.end();
     });
 

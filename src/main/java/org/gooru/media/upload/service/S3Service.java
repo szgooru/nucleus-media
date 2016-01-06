@@ -66,11 +66,20 @@ public class S3Service {
       if(bucketName != null){
         // Upload file to s3 
         S3Object fileObject = new S3Object(contentId + FileUploadConstants.UNDERSCORE + fileName, data);
-        fileObject = restS3Service.putObject(bucketName, fileObject);
-        setPublicACL(contentId + FileUploadConstants.UNDERSCORE + fileName, bucketName);
-        
-        // Delete temp file after the s3 upload 
-        Files.deleteIfExists(path);
+        S3Object uploadedObject = restS3Service.putObject(bucketName, fileObject);
+        if(uploadedObject != null){
+          LOG.info("File uploaded to s3 succeeded :   key {} ", uploadedObject.getKey());
+          setPublicACL(contentId + FileUploadConstants.UNDERSCORE + fileName, bucketName);
+          LOG.info("Set public acl to uploaded file :   key {} ", uploadedObject.getKey());
+          // Delete temp file after the s3 upload 
+          boolean fileDeleted = Files.deleteIfExists(path);
+          if(fileDeleted){
+            LOG.info("Temp file have been deleted from local file system : File name {} ", path.getFileName());
+          }
+          else{
+            LOG.error("File delete from local file system failed : File name {} ", path.getFileName());
+          }
+        }
       }
       else {
         throw new Exception("Entity type is invalid !");
@@ -90,6 +99,7 @@ public class S3Service {
     else if(entityType.equalsIgnoreCase(RouteConstants.UploadEntityType.USER.name())){
       bucketName = getS3Config(S3Constants.S3_USER_BUCKET_NAME);
     }
+    LOG.info("S3 upload bucket name {} ", bucketName);
     return bucketName;
   }
   

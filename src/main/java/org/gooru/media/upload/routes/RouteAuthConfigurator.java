@@ -26,7 +26,7 @@ public class RouteAuthConfigurator implements RouteConfigurator {
   public void configureRoutes(Vertx vertx, Router router, JsonObject config) {
     
     EventBus eBus = vertx.eventBus();
-    final long mbusTimeout = config.getLong(ConfigConstants.MBUS_TIMEOUT, 60L);
+    final long mbusTimeout = config.getLong(ConfigConstants.MBUS_TIMEOUT, 30L);
 
     router.route(RouteConstants.API_AUTH_ROUTE).handler(routingContext -> {
       String sessionToken = routingContext.request().getHeader(HttpConstants.HEADER_AUTH);
@@ -50,7 +50,8 @@ public class RouteAuthConfigurator implements RouteConfigurator {
                 routingContext.response().setStatusCode(HttpConstants.HttpStatus.FORBIDDEN.getCode())
                 .setStatusMessage(HttpConstants.HttpStatus.FORBIDDEN.getMessage())
                 .end();                
-              } else {                
+              } else {
+                LOG.debug("User authenticated, Fowarding request to next route.. ");
                 routingContext.next();
               }
             } else {
