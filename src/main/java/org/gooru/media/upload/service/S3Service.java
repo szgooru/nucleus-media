@@ -10,9 +10,8 @@ import java.util.Properties;
 import org.gooru.media.upload.constants.FileUploadConstants;
 import org.gooru.media.upload.constants.RouteConstants;
 import org.gooru.media.upload.constants.S3Constants;
-import org.jets3t.service.acl.AccessControlList;
-import org.jets3t.service.acl.GroupGrantee;
-import org.jets3t.service.acl.Permission;
+import org.gooru.media.upload.responses.models.UploadResponse;
+import org.gooru.media.upload.utils.UploadValidationUtils;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.AWSCredentials;
@@ -20,8 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.vertx.core.Context;
+import io.vertx.core.json.JsonObject;
 
-public class S3Service {
+public class S3Service extends UploadValidationUtils{
   
   private static Properties props;
   
@@ -45,50 +45,57 @@ public class S3Service {
   }
   
   public S3Service() {
-    awsCredentials = new AWSCredentials(getS3Config(S3Constants.S3_ACCESS_KEY), getS3Config(S3Constants.S3_SECRET));
-    restS3Service = new RestS3Service(awsCredentials);
-    LOG.info("accesskey : " + getS3Config(S3Constants.S3_ACCESS_KEY)  + " secret : " + getS3Config(S3Constants.S3_SECRET));
-  }
-  
-  public void setPublicACL(String objectKey, String gooruBucket) throws Exception {
-    S3Object fileObject = restS3Service.getObject(gooruBucket, objectKey);
-    AccessControlList objectAcl = restS3Service.getObjectAcl(gooruBucket, fileObject.getKey());
-    objectAcl.grantPermission(GroupGrantee.ALL_USERS, Permission.PERMISSION_READ);
-    fileObject.setAcl(objectAcl);
-    restS3Service.putObject(gooruBucket, fileObject);
+    try {
+      awsCredentials = new AWSCredentials(getS3Config(S3Constants.S3_ACCESS_KEY), getS3Config(S3Constants.S3_SECRET));
+      restS3Service = new RestS3Service(awsCredentials);
+    } catch (Exception e) {
+        LOG.error("S3 rest service start failed ! ", e);
+    }
   }
 
-  public void uploadFileS3(String fileName , String uploadLocation, String contentId, String entityType) throws Exception{
+  public UploadResponse uploadFileS3(JsonObject requestParams, String uploadLocation) throws Exception {
+    UploadResponse response = new UploadResponse();
     try{
+      validateS3FileUpload(requestParams, response);
+      if(response.isHasError()){
+        return response;
+      }
+      
+      String fileName = requestParams.getString(RouteConstants.FILE_ID);
+      String entityId = requestParams.getString(RouteConstants.ENTITY_ID);
+      String entityType = requestParams.getString(RouteConstants.ENTITY_TYPE);
+      
       Path path = Paths.get(uploadLocation + fileName);
       byte[] data = Files.readAllBytes(path);
       String bucketName = getBucketName(entityType);
-      if(bucketName != null){
-        // Upload file to s3 
-        S3Object fileObject = new S3Object(contentId + FileUploadConstants.UNDERSCORE + fileName, data);
-        S3Object uploadedObject = restS3Service.putObject(bucketName, fileObject);
-        if(uploadedObject != null){
-          LOG.info("File uploaded to s3 succeeded :   key {} ", uploadedObject.getKey());
-          setPublicACL(contentId + FileUploadConstants.UNDERSCORE + fileName, bucketName);
-          LOG.info("Set public acl to uploaded file :   key {} ", uploadedObject.getKey());
-          // Delete temp file after the s3 upload 
-          boolean fileDeleted = Files.deleteIfExists(path);
-          if(fileDeleted){
-            LOG.info("Temp file have been deleted from local file system : File name {} ", path.getFileName());
-          }
-          else{
-            LOG.error("File delete from local file system failed : File name {} ", path.getFileName());
-          }
+      
+      // Upload file to s3 
+      long start = System.currentTimeMillis();
+      S3Object fileObject = new S3Object(entityId + FileUploadConstants.UNDERSCORE + fileName, data);
+      S3Object uploadedObject = restS3Service.putObject(bucketName, fileObject);
+
+      if(uploadedObject != null){
+        LOG.info("File uploaded to s3 succeeded :   key {} ", uploadedObject.getKey());
+        LOG.info("Elapsed time to complete upload file to s3 in service :" +(System.currentTimeMillis() - start) + " ms");
+        JsonObject res = new JsonObject();
+        res.put("fileName", uploadedObject.getKey());
+        response.setResponse(res);
+        // Delete temp file after the s3 upload 
+        boolean fileDeleted = Files.deleteIfExists(path);
+        if(fileDeleted){
+          LOG.info("Temp file have been deleted from local file system : File name {} ", path.getFileName());
         }
-      }
-      else {
-        throw new Exception("Entity type is invalid !");
+        else{
+          LOG.error("File delete from local file system failed : File name {} ", path.getFileName());
+        }
       }
     }
     catch(Exception e){
       LOG.error("Upload failed : " +e);
-      throw new Exception(e);
+      rejectOnS3Error(e, response, LOG);
+      return response;
     }
+    return response;
   }
  
   private String getBucketName(String entityType){

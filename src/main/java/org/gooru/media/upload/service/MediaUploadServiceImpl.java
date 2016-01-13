@@ -1,9 +1,13 @@
 package org.gooru.media.upload.service;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Set;
 
 import org.gooru.media.upload.constants.FileUploadConstants;
+import org.gooru.media.upload.responses.models.UploadResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +20,8 @@ public class MediaUploadServiceImpl implements MediaUploadService{
   static final Logger LOG = LoggerFactory.getLogger(MediaUploadServiceImpl.class);
   
   @Override
-  public String uploadFile(RoutingContext context, String uploadLocation){
+  public UploadResponse uploadFile(RoutingContext context, String uploadLocation, String existingFname){
+    UploadResponse response = new UploadResponse();
     Set<FileUpload> files = context.fileUploads();
     if(LOG.isDebugEnabled()){
       LOG.debug("Context uploaded files : " + files.size());
@@ -24,9 +29,13 @@ public class MediaUploadServiceImpl implements MediaUploadService{
     JsonObject json = new JsonObject();
     for (FileUpload f : files) {
       LOG.info("Orginal file name : "+ f.fileName() + " Uploaded file name in file system : " + f.uploadedFileName());
-      json.put("fileName", renameFile(f.fileName(), f.uploadedFileName()));
+      json.put(FileUploadConstants.FILE_NAME, renameFile(f.fileName(), f.uploadedFileName()));
     }
-    return json.toString();
+    response.setResponse(json);
+    if(existingFname != null && !existingFname.isEmpty()){
+      deleteFile(uploadLocation+existingFname);
+    }
+    return response;
   }
   
   private String renameFile(String originalFileName, String uploadedFileName){
@@ -50,4 +59,14 @@ public class MediaUploadServiceImpl implements MediaUploadService{
     return uploadedFileName;
     
   }
+  
+ private void deleteFile(String filePath){
+   Path path = Paths.get(filePath);
+   try {
+    Files.delete(path);
+  } catch (Exception e) {
+    LOG.error("Delete existing file failed " + e) ;
+  }
+ }
+ 
 }

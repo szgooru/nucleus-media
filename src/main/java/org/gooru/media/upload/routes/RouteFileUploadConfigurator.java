@@ -1,12 +1,15 @@
 package org.gooru.media.upload.routes;
 
 import org.gooru.media.upload.constants.ConfigConstants;
-import org.gooru.media.upload.constants.HttpConstants;
+import org.gooru.media.upload.constants.ErrorsConstants;
+import org.gooru.media.upload.constants.HttpConstants.HttpStatus;
 import org.gooru.media.upload.constants.RouteConstants;
-import org.gooru.media.upload.exception.FileUploadRuntimeException;
+import org.gooru.media.upload.responses.models.UploadResponse;
 import org.gooru.media.upload.service.MediaUploadService;
 import org.gooru.media.upload.service.MediaUploadServiceImpl;
 import org.gooru.media.upload.service.S3Service;
+import org.gooru.media.upload.utils.RouteResponseUtility;
+import org.gooru.media.upload.utils.UploadValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,54 +37,42 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
     
     // upload file to file system
     router.post(RouteConstants.EP_FILE_UPLOAD).handler(context -> {
-       String existingFname = context.request().getParam(RouteConstants.EXISTING_FILE_NAME);
-       String response = uploadService.uploadFile(context, uploadLocation);
-       if(existingFname != null && !existingFname.isEmpty()){
-         vertx.fileSystem().delete(existingFname, result -> {
-           if(result.failed()){
-             LOG.warn("Delete of file '{}' failed cause '{}' ", existingFname, result.cause());         
-           }
-           else {
-             LOG.debug("Delete of file '{}' succeeded", existingFname);         
-           }
-         });
-       }
-       LOG.info("Request URL : " + context.request().absoluteURI() + "  " + context.response().getStatusCode());
-       context.response().end(response);
-     });
+      vertx.executeBlocking(future -> {
+        String existingFname = context.request().getParam(RouteConstants.EXISTING_FILE_NAME);
+        UploadResponse response = uploadService.uploadFile(context, uploadLocation, existingFname);
+        if(!response.isHasError()){
+          response.setHttpStatus(HttpStatus.CREATED.getCode());
+        }
+        future.complete(response);
+      }, res ->{
+        new RouteResponseUtility().responseHandler(context, res, LOG);
+      });
+      
+    });
     
     // move file to s3 
     router.put(RouteConstants.EP_FILE_UPLOAD_S3).handler(context -> {
-      LOG.info("test log {} ", 1);
-      LOG.info("test log 2 ");
       vertx.executeBlocking(future -> {
-        String fileName = context.request().getParam(RouteConstants.FILE_ID);
-        String contentId = context.request().getParam(RouteConstants.ENTITY_ID);
-        String entityType = context.request().getParam(RouteConstants.ENTITY_TYPE);
-        if(fileName != null && contentId != null && entityType != null){
-          try{
-            long start = System.currentTimeMillis();
-            s3Service.uploadFileS3(fileName, uploadLocation, contentId, entityType);
-            LOG.info("Elapsed time to complete upload file to s3 :" +(System.currentTimeMillis() - start) + " ms");
-            future.complete();
+        try{
+          long start = System.currentTimeMillis();
+          UploadResponse response = s3Service.uploadFileS3(context.getBodyAsJson(), uploadLocation);
+          LOG.info("Elapsed time to complete upload file to s3 :" +(System.currentTimeMillis() - start) + " ms");
+          if(!response.isHasError()){
+            response.setHttpStatus(HttpStatus.SUCCESS.getCode());
           }
-          catch(Exception e){
-            context.fail(e);
-          }
+          future.complete(response);
         }
-        else{
-          context.fail(new FileUploadRuntimeException(HttpConstants.HttpStatus.BAD_REQUEST.getMessage(), HttpConstants.HttpStatus.BAD_REQUEST.getCode()));
+        catch(Exception e){
+          context.fail(e);
         }
-      }, res ->   {
-        System.out.println("Result " + res.succeeded());
-        context.response().end();
-      });
+     }, res ->   {
+        new RouteResponseUtility().responseHandler(context, res, LOG);
+     });
     });
 
     router.route().failureHandler(failureRoutingContext -> {
       int statusCode = failureRoutingContext.statusCode();
-      LOG.error( "Route failed : " + failureRoutingContext.request().absoluteURI() +  "  Cause : "+failureRoutingContext.failure().getMessage()  + " Status code: " + statusCode);
-      if(statusCode == HttpConstants.HttpStatus.TOO_LARGE.getCode()){
+      if(statusCode == HttpStatus.TOO_LARGE.getCode()){
          // If upload fails we need to delete file from the uploaded location 
          for (FileUpload f : failureRoutingContext.fileUploads()) {
            String fileName = f.uploadedFileName();
@@ -94,15 +85,19 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
              }
             });
          }
+         new RouteResponseUtility().errorResponseHandler(failureRoutingContext, LOG, UploadValidationUtils.rejectOnError(ErrorsConstants.FIELD_NA, ErrorsConstants.EC_VE_400, ErrorsConstants.VE_006), statusCode);
       }
-      //TODO : have to add logic to send error message and code in json format 
-      HttpServerResponse response = failureRoutingContext.response();
-      if(statusCode != -1){
+      else {
+        HttpServerResponse response = failureRoutingContext.response();
+        if(statusCode != -1){
+          statusCode = HttpStatus.ERROR.getCode();
+        }
         response.setStatusCode(statusCode);
-      }
-      response.end();
-    });
 
+        response.end();
+
+      }
+    });
     
   }
 

@@ -1,9 +1,11 @@
 package org.gooru.media.upload.service;
 
+import org.gooru.media.upload.responses.models.UploadResponse;
+
 import io.vertx.ext.web.RoutingContext;
 
 public interface MediaUploadService {
 
-  String uploadFile(RoutingContext routingContext, String uploadLocation);
+  UploadResponse uploadFile(RoutingContext routingContext, String uploadLocation, String existingFname);
   
 }
