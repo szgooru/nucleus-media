@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 public class AuthVerticle extends AbstractVerticle {
 
-  static final Logger LOGGER = LoggerFactory.getLogger(AuthVerticle.class);
   public static final String MBEP_AUTH = "org.gooru.media.upload.auth";
   public static final String MSG_HEADER_OP = "mb.operation";
   public static final String MSG_HEADER_TOKEN = "session.token";
@@ -21,6 +20,7 @@ public class AuthVerticle extends AbstractVerticle {
   public static final String MSG_OP_STATUS_SUCCESS = "success";
   public static final String MSG_OP_STATUS_ERROR = "error";
   public static final String REDIS_CONFIGURATION_KEY = "redis.config";
+  static final Logger LOGGER = LoggerFactory.getLogger(AuthVerticle.class);
   RedisClient redisClient;
 
   @Override
@@ -56,7 +56,7 @@ public class AuthVerticle extends AbstractVerticle {
               deliveryOptions.addHeader(MSG_OP_STATUS, MSG_OP_STATUS_ERROR);
             }
             message.reply(result, deliveryOptions);
-            
+
           });
         }
       } else {

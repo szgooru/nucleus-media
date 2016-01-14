@@ -1,29 +1,26 @@
 package org.gooru.media.upload.responses.transformers;
 
-import java.util.Map;
-
+import io.vertx.core.json.JsonObject;
 import org.gooru.media.upload.responses.models.UploadError;
 import org.gooru.media.upload.responses.models.UploadResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.vertx.core.json.JsonObject;
+import java.util.Map;
 
 class HttpResponseTransformer implements ResponseTransformer {
 
   static final Logger LOG = LoggerFactory.getLogger(ResponseTransformer.class);
+  private static final String ERROR_TYPE = "type";
+  private static final String ERRORS = "errors";
   private UploadResponse message;
   private boolean transformed = false;
   private Map<String, String> headers;
   private int httpStatus;
   private String httpBody;
-  
-  private static final String ERROR_TYPE = "type";
-  
-  private static final String ERRORS = "errors";
 
   public HttpResponseTransformer(Object message) {
-    this.message = (UploadResponse)message;
+    this.message = (UploadResponse) message;
     if (message == null) {
       LOG.error("Invalid or null Message<Object> for initialization");
       throw new IllegalArgumentException("Invalid or null Message<Object> for initialization");
@@ -33,7 +30,7 @@ class HttpResponseTransformer implements ResponseTransformer {
       throw new IllegalArgumentException("Message body should be JsonObject");
     }
   }
-  
+
   @Override
   public void transform() {
     if (!this.transformed) {
@@ -63,16 +60,15 @@ class HttpResponseTransformer implements ResponseTransformer {
   private void processTransformation() {
     // First initialize the http status
     this.httpStatus = message.getHttpStatus();
-    
+
     // Now delegate the body handling
     boolean hasError = message.isHasError();
-    
+
     LOG.info("Request has error : " + hasError);
-    
-    if(hasError){
+
+    if (hasError) {
       processErrorTransformation(message.getError());
-    }
-    else {
+    } else {
       processSuccessTransformation(message.getResponse());
     }
     // Now that we are done, mark it as transformed
@@ -89,7 +85,6 @@ class HttpResponseTransformer implements ResponseTransformer {
   private void processSuccessTransformation(JsonObject messageBody) {
     this.httpBody = messageBody.toString();
   }
-
 
 
 }

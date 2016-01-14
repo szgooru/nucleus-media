@@ -5,13 +5,13 @@ import io.vertx.core.json.JsonObject;
 public class UploadResponse extends JsonObject {
 
   private JsonObject response;
-  
+
   private UploadError error;
-  
+
   private boolean hasError;
-  
+
   private int httpStatus;
-  
+
   public JsonObject getResponse() {
     return response;
   }
@@ -19,7 +19,7 @@ public class UploadResponse extends JsonObject {
   public void setResponse(JsonObject response) {
     this.response = response;
   }
- 
+
   public boolean isHasError() {
     return hasError;
   }
@@ -44,5 +44,5 @@ public class UploadResponse extends JsonObject {
   public void setError(UploadError error) {
     this.error = error;
   }
-  
+
 }

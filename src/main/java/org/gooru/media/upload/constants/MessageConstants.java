@@ -18,7 +18,7 @@ public class MessageConstants {
   public static final String MSG_HTTP_ERROR = "http.error";
   public static final String MSG_HTTP_VALIDATION_ERROR = "http.validation.error";
   public static final String MSG_HTTP_HEADERS = "http.headers";
-  
+
   // Operation names: Also need to be updated in corresponding handlers
 
   // Resource operations

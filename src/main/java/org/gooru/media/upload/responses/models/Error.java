@@ -5,17 +5,17 @@ import io.vertx.core.json.JsonObject;
 public class Error extends JsonObject {
 
   private static final String CODE = "code";
-  
+
   private static final String FIELD_NAME = "field_name";
-  
+
   private static final String MESSAGE = "message";
-  
-  public Error(String fieldName, String code, String message){
+
+  public Error(String fieldName, String code, String message) {
     this.setCode(code);
     this.setFieldName(fieldName);
     this.setMessage(message);
   }
-  
+
   public String getCode() {
     return this.getString(CODE);
   }

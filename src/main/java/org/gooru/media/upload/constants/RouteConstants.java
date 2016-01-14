@@ -14,30 +14,29 @@ public class RouteConstants {
 
   // Upload file = /api/nucleus/{version}/media/upload
   public static final String EP_FILE_UPLOAD = API_BASE_ROUTE + ENTITY_MEDIA;
-  
+
   // Upload file = /api/nucleus/{version}/media/upload/s3
-  public static final String EP_FILE_UPLOAD_S3 = API_BASE_ROUTE + MOVE_FILE_S3; 
-  
+  public static final String EP_FILE_UPLOAD_S3 = API_BASE_ROUTE + MOVE_FILE_S3;
+
   public static final String EXISTING_FILE_NAME = "existingFileName";
   public static final String ENTITY_ID = "entityId";
   public static final String ENTITY_TYPE = "entityType";
   public static final String FILE_ID = "fileId";
-  
+
   public enum UploadEntityType {
     CONTENT("content"),
     USER("user");
-    
+
     private String message;
-    
-    private UploadEntityType(String message){
+
+    private UploadEntityType(String message) {
       this.message = message;
     }
-    
-    public String getMessage(){
+
+    public String getMessage() {
       return message;
     }
   }
-  
-  
+
 
 }

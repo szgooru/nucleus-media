@@ -14,7 +14,7 @@ public class ResponseWriterBuilder {
     this.routingContext = routingContext;
     this.message = message;
   }
-  
+
   public ResponseWriter build() {
     return new HttpServerResponseWriter(this.routingContext, this.message);
   }

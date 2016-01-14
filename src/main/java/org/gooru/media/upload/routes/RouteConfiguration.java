@@ -9,7 +9,15 @@ public class RouteConfiguration implements Iterable<RouteConfigurator> {
 
   private List<RouteConfigurator> configurators = null;
   private Iterator<RouteConfigurator> internalIterator;
-  
+
+  public RouteConfiguration() {
+    configurators = new ArrayList<RouteConfigurator>();
+    configurators.add(new RouteGlobalConfigurator());
+    configurators.add(new RouteAuthConfigurator());
+    configurators.add(new RouteFileUploadConfigurator());
+    internalIterator = configurators.iterator();
+  }
+
   @Override
   public Iterator<RouteConfigurator> iterator() {
     Iterator<RouteConfigurator> iterator = new Iterator<RouteConfigurator>() {
@@ -23,17 +31,9 @@ public class RouteConfiguration implements Iterable<RouteConfigurator> {
       public RouteConfigurator next() {
         return internalIterator.next();
       }
-      
+
     };
     return iterator;
-  }
-  
-  public RouteConfiguration() {
-    configurators = new ArrayList<RouteConfigurator>();
-    configurators.add(new RouteGlobalConfigurator());
-    configurators.add(new RouteAuthConfigurator());
-    configurators.add(new RouteFileUploadConfigurator());
-    internalIterator = configurators.iterator();
   }
 
 }

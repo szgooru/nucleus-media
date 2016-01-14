@@ -20,8 +20,8 @@ public class RouteRequestUtility {
     if (httpBody != null) {
       result.put(MessageConstants.MSG_HTTP_BODY, httpBody);
     }
-    result.put(MessageConstants.MSG_KEY_PREFS, (JsonObject)routingContext.get(MessageConstants.MSG_KEY_PREFS));
-    result.put(MessageConstants.MSG_USER_ID, (String)routingContext.get(MessageConstants.MSG_USER_ID));
+    result.put(MessageConstants.MSG_KEY_PREFS, (JsonObject) routingContext.get(MessageConstants.MSG_KEY_PREFS));
+    result.put(MessageConstants.MSG_USER_ID, (String) routingContext.get(MessageConstants.MSG_USER_ID));
     return result;
   }
 }

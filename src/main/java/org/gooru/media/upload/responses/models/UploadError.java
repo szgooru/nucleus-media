@@ -4,11 +4,11 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 public class UploadError extends JsonObject {
-  
+
   private JsonArray errors;
-  
+
   private String type;
-  
+
   public JsonArray getErrors() {
     return errors;
   }
@@ -25,5 +25,5 @@ public class UploadError extends JsonObject {
     this.type = type;
   }
 
-     
+
 }
