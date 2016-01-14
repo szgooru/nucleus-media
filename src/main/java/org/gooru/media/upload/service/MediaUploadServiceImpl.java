@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class MediaUploadServiceImpl implements MediaUploadService {
 
-  static final Logger LOG = LoggerFactory.getLogger(MediaUploadServiceImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MediaUploadServiceImpl.class);
 
   @Override
   public UploadResponse uploadFile(RoutingContext context, String uploadLocation, String existingFname) {

@@ -1,7 +1,7 @@
 package org.gooru.media.upload.responses.auth;
 
 public interface AuthResponseHolder {
-  public boolean isAuthorized();
+  boolean isAuthorized();
 
-  public boolean isAnonymous();
+  boolean isAnonymous();
 }

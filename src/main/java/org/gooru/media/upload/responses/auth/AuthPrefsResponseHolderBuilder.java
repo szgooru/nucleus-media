@@ -3,7 +3,7 @@ package org.gooru.media.upload.responses.auth;
 import io.vertx.core.eventbus.Message;
 
 public class AuthPrefsResponseHolderBuilder {
-  private Message<Object> message;
+  private final Message<Object> message;
 
   public AuthPrefsResponseHolderBuilder(Message<Object> message) {
     this.message = message;

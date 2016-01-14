@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 public class RouteFileUploadConfigurator implements RouteConfigurator {
 
-  static final Logger LOG = LoggerFactory.getLogger("org.gooru.media.upload.bootstrap.FileUploadVerticle");
+  private static final Logger LOG = LoggerFactory.getLogger("org.gooru.media.upload.bootstrap.FileUploadVerticle");
 
   private MediaUploadService uploadService;
 
@@ -35,38 +35,29 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
     s3Service = new S3Service();
 
     // upload file to file system
-    router.post(RouteConstants.EP_FILE_UPLOAD).handler(context -> {
-      vertx.executeBlocking(future -> {
-        String existingFname = context.request().getParam(RouteConstants.EXISTING_FILE_NAME);
-        UploadResponse response = uploadService.uploadFile(context, uploadLocation, existingFname);
-        if (!response.isHasError()) {
-          response.setHttpStatus(HttpStatus.CREATED.getCode());
-        }
-        future.complete(response);
-      }, res -> {
-        new RouteResponseUtility().responseHandler(context, res, LOG);
-      });
-
-    });
+    router.post(RouteConstants.EP_FILE_UPLOAD).handler(context -> vertx.executeBlocking(future -> {
+      String existingFname = context.request().getParam(RouteConstants.EXISTING_FILE_NAME);
+      UploadResponse response = uploadService.uploadFile(context, uploadLocation, existingFname);
+      if (!response.isHasError()) {
+        response.setHttpStatus(HttpStatus.CREATED.getCode());
+      }
+      future.complete(response);
+    }, res -> new RouteResponseUtility().responseHandler(context, res, LOG)));
 
     // move file to s3 
-    router.put(RouteConstants.EP_FILE_UPLOAD_S3).handler(context -> {
-      vertx.executeBlocking(future -> {
-        try {
-          long start = System.currentTimeMillis();
-          UploadResponse response = s3Service.uploadFileS3(context.getBodyAsJson(), uploadLocation);
-          LOG.info("Elapsed time to complete upload file to s3 :" + (System.currentTimeMillis() - start) + " ms");
-          if (!response.isHasError()) {
-            response.setHttpStatus(HttpStatus.SUCCESS.getCode());
-          }
-          future.complete(response);
-        } catch (Exception e) {
-          context.fail(e);
+    router.put(RouteConstants.EP_FILE_UPLOAD_S3).handler(context -> vertx.executeBlocking(future -> {
+      try {
+        long start = System.currentTimeMillis();
+        UploadResponse response = s3Service.uploadFileS3(context.getBodyAsJson(), uploadLocation);
+        LOG.info("Elapsed time to complete upload file to s3 :" + (System.currentTimeMillis() - start) + " ms");
+        if (!response.isHasError()) {
+          response.setHttpStatus(HttpStatus.SUCCESS.getCode());
         }
-      }, res -> {
-        new RouteResponseUtility().responseHandler(context, res, LOG);
-      });
-    });
+        future.complete(response);
+      } catch (Exception e) {
+        context.fail(e);
+      }
+    }, res -> new RouteResponseUtility().responseHandler(context, res, LOG)));
 
     router.route().failureHandler(failureRoutingContext -> {
       int statusCode = failureRoutingContext.statusCode();

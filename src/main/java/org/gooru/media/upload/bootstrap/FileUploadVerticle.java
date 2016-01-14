@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class FileUploadVerticle extends AbstractVerticle {
 
-  static final Logger LOG = LoggerFactory.getLogger(FileUploadVerticle.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FileUploadVerticle.class);
 
   @Override
   public void start() throws Exception {

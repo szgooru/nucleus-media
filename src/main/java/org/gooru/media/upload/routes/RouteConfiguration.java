@@ -7,11 +7,10 @@ import java.util.List;
 
 public class RouteConfiguration implements Iterable<RouteConfigurator> {
 
-  private List<RouteConfigurator> configurators = null;
-  private Iterator<RouteConfigurator> internalIterator;
+  private final Iterator<RouteConfigurator> internalIterator;
 
   public RouteConfiguration() {
-    configurators = new ArrayList<RouteConfigurator>();
+    List<RouteConfigurator> configurators = new ArrayList<>();
     configurators.add(new RouteGlobalConfigurator());
     configurators.add(new RouteAuthConfigurator());
     configurators.add(new RouteFileUploadConfigurator());
@@ -20,7 +19,7 @@ public class RouteConfiguration implements Iterable<RouteConfigurator> {
 
   @Override
   public Iterator<RouteConfigurator> iterator() {
-    Iterator<RouteConfigurator> iterator = new Iterator<RouteConfigurator>() {
+    return new Iterator<RouteConfigurator>() {
 
       @Override
       public boolean hasNext() {
@@ -33,7 +32,6 @@ public class RouteConfiguration implements Iterable<RouteConfigurator> {
       }
 
     };
-    return iterator;
   }
 
 }

@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 
 public class RouteAuthConfigurator implements RouteConfigurator {
 
-  public static final String MBEP_AUTH = "org.gooru.media.upload.auth";
-  static final Logger LOG = LoggerFactory.getLogger("org.gooru.media.upload.bootstrap.FileUploadVerticle");
+  private static final String MBEP_AUTH = "org.gooru.media.upload.auth";
+  private static final Logger LOG = LoggerFactory.getLogger("org.gooru.media.upload.bootstrap.FileUploadVerticle");
 
   @Override
   public void configureRoutes(Vertx vertx, Router router, JsonObject config) {

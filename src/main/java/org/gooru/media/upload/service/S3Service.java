@@ -22,15 +22,14 @@ import java.util.Properties;
 
 public class S3Service extends UploadValidationUtils {
 
-  static final Logger LOG = LoggerFactory.getLogger(S3Service.class);
+  private static final Logger LOG = LoggerFactory.getLogger(S3Service.class);
   private static Properties props;
-  private static AWSCredentials awsCredentials;
   protected Context context;
   private RestS3Service restS3Service;
 
   public S3Service() {
     try {
-      awsCredentials = new AWSCredentials(getS3Config(S3Constants.S3_ACCESS_KEY), getS3Config(S3Constants.S3_SECRET));
+      AWSCredentials awsCredentials = new AWSCredentials(getS3Config(S3Constants.S3_ACCESS_KEY), getS3Config(S3Constants.S3_SECRET));
       restS3Service = new RestS3Service(awsCredentials);
     } catch (Exception e) {
       LOG.error("S3 rest service start failed ! ", e);
@@ -52,7 +51,7 @@ public class S3Service extends UploadValidationUtils {
     return props.getProperty(key);
   }
 
-  public UploadResponse uploadFileS3(JsonObject requestParams, String uploadLocation) throws Exception {
+  public UploadResponse uploadFileS3(JsonObject requestParams, String uploadLocation) {
     UploadResponse response = new UploadResponse();
     try {
       validateS3FileUpload(requestParams, response);

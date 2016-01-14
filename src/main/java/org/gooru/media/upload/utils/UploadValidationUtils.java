@@ -28,7 +28,6 @@ public class UploadValidationUtils extends ErrorsConstants {
   public static void rejectOnS3Error(Exception e, UploadResponse response, final Logger logger) {
     JsonArray errors = new JsonArray();
     if (e instanceof S3ServiceException) {
-      e = (S3ServiceException) e;
       addError(FIELD_NA, ((ServiceException) e).getErrorCode(), e.getMessage(), errors);
       setResponse(errors, response, HttpStatus.ERROR.getCode(), ErrorsConstants.UploadErrorType.SERVER.getType());
     } else {

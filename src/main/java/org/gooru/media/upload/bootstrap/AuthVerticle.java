@@ -12,16 +12,16 @@ import org.slf4j.LoggerFactory;
 
 public class AuthVerticle extends AbstractVerticle {
 
-  public static final String MBEP_AUTH = "org.gooru.media.upload.auth";
-  public static final String MSG_HEADER_OP = "mb.operation";
-  public static final String MSG_HEADER_TOKEN = "session.token";
-  public static final String MSG_OP_AUTH = "auth";
-  public static final String MSG_OP_STATUS = "mb.operation.status";
-  public static final String MSG_OP_STATUS_SUCCESS = "success";
-  public static final String MSG_OP_STATUS_ERROR = "error";
-  public static final String REDIS_CONFIGURATION_KEY = "redis.config";
-  static final Logger LOGGER = LoggerFactory.getLogger(AuthVerticle.class);
-  RedisClient redisClient;
+  private static final String MBEP_AUTH = "org.gooru.media.upload.auth";
+  private static final String MSG_HEADER_OP = "mb.operation";
+  private static final String MSG_HEADER_TOKEN = "session.token";
+  private static final String MSG_OP_AUTH = "auth";
+  private static final String MSG_OP_STATUS = "mb.operation.status";
+  private static final String MSG_OP_STATUS_SUCCESS = "success";
+  private static final String MSG_OP_STATUS_ERROR = "error";
+  private static final String REDIS_CONFIGURATION_KEY = "redis.config";
+  private static final Logger LOGGER = LoggerFactory.getLogger(AuthVerticle.class);
+  private RedisClient redisClient;
 
   @Override
   public void start(Future<Void> startFuture) throws Exception {

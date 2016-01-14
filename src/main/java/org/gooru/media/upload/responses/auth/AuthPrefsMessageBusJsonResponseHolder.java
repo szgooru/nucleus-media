@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 class AuthPrefsMessageBusJsonResponseHolder implements AuthResponseHolder {
 
-  static final Logger LOG = LoggerFactory.getLogger(AuthResponseHolder.class);
-  private Message<Object> message;
+  private static final Logger LOG = LoggerFactory.getLogger(AuthResponseHolder.class);
+  private final Message<Object> message;
   private boolean isAuthorized = false;
 
   public AuthPrefsMessageBusJsonResponseHolder(Message<Object> message) {

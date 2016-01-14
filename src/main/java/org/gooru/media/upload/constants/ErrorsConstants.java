@@ -25,9 +25,9 @@ public class ErrorsConstants {
     VALIDATION("validation"),
     SERVER("server");
 
-    private String type;
+    private final String type;
 
-    private UploadErrorType(String type) {
+    UploadErrorType(String type) {
       this.type = type;
     }
 
