@@ -27,7 +27,13 @@ public class RouteAuthConfigurator implements RouteConfigurator {
     final long mbusTimeout = config.getLong(ConfigConstants.MBUS_TIMEOUT, 30L);
 
     router.route(RouteConstants.API_AUTH_ROUTE).handler(routingContext -> {
-      String sessionToken = routingContext.request().getHeader(HttpConstants.HEADER_AUTH);
+      
+      String authorization = routingContext.request().getHeader(HttpConstants.HEADER_AUTH);
+      String sessionToken = null;
+      if (authorization != null && authorization.startsWith(HttpConstants.TOKEN)) {
+        sessionToken = authorization.substring(HttpConstants.TOKEN.length()).trim();
+      }
+
       // If the session token is null or absent, we send an error to client
       if (sessionToken == null || sessionToken.isEmpty()) {
         routingContext.response().setStatusCode(HttpConstants.HttpStatus.UNAUTHORIZED.getCode())
