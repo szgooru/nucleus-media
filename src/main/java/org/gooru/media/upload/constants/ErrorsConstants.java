@@ -6,10 +6,6 @@ public class ErrorsConstants {
 
   public static final String VE_001 = "Sessiontoken cannot be null";
 
-  public static final String VE_002 = "Filename cannot be null";
-
-  public static final String VE_003 = "Entity id cannot be null";
-
   public static final String VE_004 = "Entity type cannot be null";
 
   public static final String VE_005 = "Invalid entity type";

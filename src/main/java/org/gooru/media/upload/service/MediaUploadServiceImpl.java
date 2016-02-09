@@ -1,40 +1,35 @@
 package org.gooru.media.upload.service;
 
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.FileUpload;
-import io.vertx.ext.web.RoutingContext;
+import java.io.File;
+import java.util.Set;
+
 import org.gooru.media.upload.constants.FileUploadConstants;
+import org.gooru.media.upload.constants.RouteConstants;
 import org.gooru.media.upload.responses.models.UploadResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Set;
+import io.vertx.ext.web.FileUpload;
+import io.vertx.ext.web.RoutingContext;
 
 public class MediaUploadServiceImpl implements MediaUploadService {
 
   private static final Logger LOG = LoggerFactory.getLogger(MediaUploadServiceImpl.class);
-
+  
   @Override
-  public UploadResponse uploadFile(RoutingContext context, String uploadLocation, String existingFname) {
-    UploadResponse response = new UploadResponse();
+  public UploadResponse uploadFile(RoutingContext context, String uploadLocation, S3Service s3Service) {
     Set<FileUpload> files = context.fileUploads();
+    String entityType = context.request().getParam(RouteConstants.ENTITY_TYPE);
+    
     if (LOG.isDebugEnabled()) {
       LOG.debug("Context uploaded files : " + files.size());
     }
-    JsonObject json = new JsonObject();
     for (FileUpload f : files) {
       LOG.info("Orginal file name : " + f.fileName() + " Uploaded file name in file system : " + f.uploadedFileName());
-      json.put(FileUploadConstants.FILE_NAME, renameFile(f.fileName(), f.uploadedFileName()));
+     String fileName = renameFile(f.fileName(), f.uploadedFileName());
+     return s3Service.uploadFileS3(uploadLocation, entityType, fileName);
     }
-    response.setResponse(json);
-    if (existingFname != null && !existingFname.isEmpty()) {
-      deleteFile(uploadLocation + existingFname);
-    }
-    return response;
+    return null;
   }
 
   private String renameFile(String originalFileName, String uploadedFileName) {
@@ -57,14 +52,4 @@ public class MediaUploadServiceImpl implements MediaUploadService {
     return uploadedFileName;
 
   }
-
-  private void deleteFile(String filePath) {
-    Path path = Paths.get(filePath);
-    try {
-      Files.delete(path);
-    } catch (Exception e) {
-      LOG.error("Delete existing file failed " + e);
-    }
-  }
-
 }

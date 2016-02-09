@@ -1,7 +1,5 @@
 package org.gooru.media.upload.utils;
 
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import org.gooru.media.upload.constants.ErrorsConstants;
 import org.gooru.media.upload.constants.HttpConstants.HttpStatus;
 import org.gooru.media.upload.constants.RouteConstants;
@@ -12,6 +10,8 @@ import org.gooru.media.upload.responses.models.UploadResponse;
 import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.ServiceException;
 import org.slf4j.Logger;
+
+import io.vertx.core.json.JsonArray;
 
 public class UploadValidationUtils extends ErrorsConstants {
 
@@ -47,23 +47,8 @@ public class UploadValidationUtils extends ErrorsConstants {
     }
   }
 
-  public UploadResponse validateS3FileUpload(JsonObject requestValues, UploadResponse response) {
+  public UploadResponse validateEntityType(String entityType, UploadResponse response) {
     JsonArray errors = new JsonArray();
-    if (requestValues == null || requestValues.isEmpty()) {
-      addError(FIELD_NA, EC_VE_400, VE_000, errors);
-    } else {
-      String fileName = requestValues.getString(RouteConstants.FILE_ID);
-      String entityId = requestValues.getString(RouteConstants.ENTITY_ID);
-      String entityType = requestValues.getString(RouteConstants.ENTITY_TYPE);
-
-      if (fileName == null || fileName.isEmpty()) {
-        addError(RouteConstants.FILE_ID, EC_VE_400, VE_002, errors);
-      }
-
-      if (entityId == null || entityId.isEmpty()) {
-        addError(RouteConstants.ENTITY_ID, EC_VE_400, VE_003, errors);
-      }
-
       if (entityType == null || entityType.isEmpty()) {
         addError(RouteConstants.ENTITY_TYPE, EC_VE_400, VE_004, errors);
       }
@@ -74,8 +59,6 @@ public class UploadValidationUtils extends ErrorsConstants {
           addError(RouteConstants.ENTITY_TYPE, EC_VE_400, VE_005, errors);
         }
       }
-    }
-
     setResponse(errors, response, HttpStatus.BAD_REQUEST.getCode(), ErrorsConstants.UploadErrorType.VALIDATION.getType());
     return response;
   }

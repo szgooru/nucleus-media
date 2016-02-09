@@ -34,27 +34,20 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
     S3Service.setS3Config(s3ConfiFileLocation);
     s3Service = new S3Service();
 
-    // upload file to file system
-    router.post(RouteConstants.EP_FILE_UPLOAD).handler(context -> vertx.executeBlocking(future -> {
-      String existingFname = context.request().getParam(RouteConstants.EXISTING_FILE_NAME);
-      UploadResponse response = uploadService.uploadFile(context, uploadLocation, existingFname);
-      if (!response.isHasError()) {
-        response.setHttpStatus(HttpStatus.CREATED.getCode());
-      }
-      future.complete(response);
-    }, res -> new RouteResponseUtility().responseHandler(context, res, LOG)));
-
-    // move file to s3 
-    router.put(RouteConstants.EP_FILE_UPLOAD_S3).handler(context -> vertx.executeBlocking(future -> {
+    // upload file to s3 
+    router.post(RouteConstants.EP_FILE_UPLOAD_S3).handler(context -> vertx.executeBlocking(future -> {
       try {
         long start = System.currentTimeMillis();
-        UploadResponse response = s3Service.uploadFileS3(context.getBodyAsJson(), uploadLocation);
+
+        UploadResponse response = uploadService.uploadFile(context, uploadLocation, s3Service);
+
         LOG.info("Elapsed time to complete upload file to s3 :" + (System.currentTimeMillis() - start) + " ms");
         if (!response.isHasError()) {
           response.setHttpStatus(HttpStatus.SUCCESS.getCode());
         }
         future.complete(response);
       } catch (Exception e) {
+        LOG.error("Un handled exception : " + e);
         context.fail(e);
       }
     }, res -> new RouteResponseUtility().responseHandler(context, res, LOG)));
@@ -77,7 +70,7 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
           UploadValidationUtils.rejectOnError(ErrorsConstants.FIELD_NA, ErrorsConstants.EC_VE_400, ErrorsConstants.VE_006), statusCode);
       } else {
         HttpServerResponse response = failureRoutingContext.response();
-        if (statusCode != -1) {
+        if (statusCode == -1) {
           statusCode = HttpStatus.ERROR.getCode();
         }
         response.setStatusCode(statusCode);

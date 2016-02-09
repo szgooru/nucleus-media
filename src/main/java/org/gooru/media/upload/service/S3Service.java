@@ -1,8 +1,12 @@
 package org.gooru.media.upload.service;
 
-import io.vertx.core.Context;
-import io.vertx.core.json.JsonObject;
-import org.gooru.media.upload.constants.FileUploadConstants;
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Properties;
+
 import org.gooru.media.upload.constants.RouteConstants;
 import org.gooru.media.upload.constants.S3Constants;
 import org.gooru.media.upload.responses.models.UploadResponse;
@@ -13,16 +17,14 @@ import org.jets3t.service.security.AWSCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Properties;
+import io.vertx.core.Context;
+import io.vertx.core.json.JsonObject;
 
 public class S3Service extends UploadValidationUtils {
 
   private static final Logger LOG = LoggerFactory.getLogger(S3Service.class);
+  private static final Logger S3_LOG = LoggerFactory.getLogger("log.s3");
+
   private static Properties props;
   protected Context context;
   private RestS3Service restS3Service;
@@ -51,25 +53,22 @@ public class S3Service extends UploadValidationUtils {
     return props.getProperty(key);
   }
 
-  public UploadResponse uploadFileS3(JsonObject requestParams, String uploadLocation) {
+  public UploadResponse uploadFileS3(String fileLocation, String entityType, String fileName) {
+
     UploadResponse response = new UploadResponse();
     try {
-      validateS3FileUpload(requestParams, response);
+      validateEntityType(entityType, response);
       if (response.isHasError()) {
         return response;
       }
 
-      String fileName = requestParams.getString(RouteConstants.FILE_ID);
-      String entityId = requestParams.getString(RouteConstants.ENTITY_ID);
-      String entityType = requestParams.getString(RouteConstants.ENTITY_TYPE);
-
-      Path path = Paths.get(uploadLocation + fileName);
+      Path path = Paths.get(fileLocation + fileName);
       byte[] data = Files.readAllBytes(path);
       String bucketName = getBucketName(entityType);
 
       // Upload file to s3
       long start = System.currentTimeMillis();
-      S3Object fileObject = new S3Object(entityId + FileUploadConstants.UNDERSCORE + fileName, data);
+      S3Object fileObject = new S3Object(fileName, data);
       S3Object uploadedObject = restS3Service.putObject(bucketName, fileObject);
 
       if (uploadedObject != null) {
@@ -77,6 +76,7 @@ public class S3Service extends UploadValidationUtils {
         LOG.info("Elapsed time to complete upload file to s3 in service :" + (System.currentTimeMillis() - start) + " ms");
         JsonObject res = new JsonObject();
         res.put("fileName", uploadedObject.getKey());
+        S3_LOG.info("S3 Uploaded Id : " + uploadedObject.getKey());
         response.setResponse(res);
         // Delete temp file after the s3 upload
         boolean fileDeleted = Files.deleteIfExists(path);
