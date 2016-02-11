@@ -15,26 +15,27 @@ import io.vertx.ext.web.RoutingContext;
 public class MediaUploadServiceImpl implements MediaUploadService {
 
   private static final Logger LOG = LoggerFactory.getLogger(MediaUploadServiceImpl.class);
-  
+
   @Override
-  public UploadResponse uploadFile(RoutingContext context, String uploadLocation, S3Service s3Service) {
+  public UploadResponse uploadFile(RoutingContext context, String uploadLocation) {
     Set<FileUpload> files = context.fileUploads();
     String entityType = context.request().getParam(RouteConstants.ENTITY_TYPE);
-    
+
     if (LOG.isDebugEnabled()) {
       LOG.debug("Context uploaded files : " + files.size());
     }
+
     for (FileUpload f : files) {
       LOG.info("Orginal file name : " + f.fileName() + " Uploaded file name in file system : " + f.uploadedFileName());
-     String fileName = renameFile(f.fileName(), f.uploadedFileName());
-     return s3Service.uploadFileS3(uploadLocation, entityType, fileName);
+      String fileName = renameFile(f.fileName(), f.uploadedFileName());
+      return S3Service.getInstance().uploadFileS3(uploadLocation, entityType, fileName);
     }
     return null;
   }
 
   private String renameFile(String originalFileName, String uploadedFileName) {
     try {
-      // Get file extension 
+      // Get file extension
       int index = originalFileName.lastIndexOf(FileUploadConstants.DOT);
 
       if (index > 0) {

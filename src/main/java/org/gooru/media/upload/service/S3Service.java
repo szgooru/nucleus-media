@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import io.vertx.core.Context;
 import io.vertx.core.json.JsonObject;
 
-public class S3Service extends UploadValidationUtils {
+public final class S3Service {
 
   private static final Logger LOG = LoggerFactory.getLogger(S3Service.class);
   private static final Logger S3_LOG = LoggerFactory.getLogger("log.s3");
@@ -28,6 +28,8 @@ public class S3Service extends UploadValidationUtils {
   private static Properties props;
   protected Context context;
   private RestS3Service restS3Service;
+  private static S3Service s3Service;
+  private static final String FILE_NAME = "filename";
 
   public S3Service() {
     try {
@@ -57,7 +59,7 @@ public class S3Service extends UploadValidationUtils {
 
     UploadResponse response = new UploadResponse();
     try {
-      validateEntityType(entityType, response);
+      UploadValidationUtils.validateEntityType(entityType, response);
       if (response.isHasError()) {
         return response;
       }
@@ -75,7 +77,7 @@ public class S3Service extends UploadValidationUtils {
         LOG.info("File uploaded to s3 succeeded :   key {} ", uploadedObject.getKey());
         LOG.info("Elapsed time to complete upload file to s3 in service :" + (System.currentTimeMillis() - start) + " ms");
         JsonObject res = new JsonObject();
-        res.put("fileName", uploadedObject.getKey());
+        res.put(FILE_NAME, uploadedObject.getKey());
         S3_LOG.info("S3 Uploaded Id : " + uploadedObject.getKey());
         response.setResponse(res);
         // Delete temp file after the s3 upload
@@ -88,7 +90,7 @@ public class S3Service extends UploadValidationUtils {
       }
     } catch (Exception e) {
       LOG.error("Upload failed : " + e);
-      rejectOnS3Error(e, response, LOG);
+      UploadValidationUtils.rejectOnS3Error(e, response, LOG);
       return response;
     }
     return response;
@@ -103,5 +105,14 @@ public class S3Service extends UploadValidationUtils {
     }
     LOG.info("S3 upload bucket name {} ", bucketName);
     return bucketName;
+  }
+
+  public static S3Service getInstance() {
+    if (s3Service == null) {
+      synchronized (S3Service.class) {
+        s3Service = new S3Service();
+      }
+    }
+    return s3Service;
   }
 }

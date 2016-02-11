@@ -6,6 +6,10 @@ import io.vertx.ext.web.RoutingContext;
 
 public interface MediaUploadService {
 
-  UploadResponse uploadFile(RoutingContext routingContext, String uploadLocation, S3Service s3Service);
+  static MediaUploadService instance() {
+    return new MediaUploadServiceImpl();
+  }
+
+  UploadResponse uploadFile(RoutingContext routingContext, String uploadLocation);
 
 }

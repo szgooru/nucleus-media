@@ -64,7 +64,7 @@ class HttpResponseTransformer implements ResponseTransformer {
     // Now delegate the body handling
     boolean hasError = message.isHasError();
 
-    LOG.info("Request has error : " + hasError);
+    LOG.debug("Request has error : " + hasError);
 
     if (hasError) {
       processErrorTransformation(message.getError());
@@ -77,8 +77,7 @@ class HttpResponseTransformer implements ResponseTransformer {
 
   private void processErrorTransformation(UploadError messageBody) {
     JsonObject error = new JsonObject();
-    error.put(ERROR_TYPE, messageBody.getType());
-    error.put(ERRORS, messageBody.getErrors().toString());
+    error.put(ERRORS, messageBody.getErrors());
     this.httpBody = error.toString();
   }
 

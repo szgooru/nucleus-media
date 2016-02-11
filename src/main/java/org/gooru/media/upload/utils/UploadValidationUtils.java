@@ -41,13 +41,12 @@ public class UploadValidationUtils extends ErrorsConstants {
       response.setHasError(true);
       UploadError validationError = new UploadError();
       validationError.setErrors(errors);
-      validationError.setType(errorType);
       response.setError(validationError);
       response.setHttpStatus(httpStatus);
     }
   }
 
-  public UploadResponse validateEntityType(String entityType, UploadResponse response) {
+  public static UploadResponse validateEntityType(String entityType, UploadResponse response) {
     JsonArray errors = new JsonArray();
       if (entityType == null || entityType.isEmpty()) {
         addError(RouteConstants.ENTITY_TYPE, EC_VE_400, VE_004, errors);
