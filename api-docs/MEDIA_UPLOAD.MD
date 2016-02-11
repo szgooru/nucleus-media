@@ -32,6 +32,6 @@ Authorization: Token YjllOTI0NjEtMzFjZC00ZGYxLWEyN2MtNzNjMjZkODI3NmVmOk1vbiBKYW4
 **CURL snippet**
 
 ```posh
-curl -i  -H "Authorization: Token YjllOTI0NjEtMzFjZC00ZGYxLWEyN2MtNzNjMjZkODI3NmVmOk1vbiBKYW4gMjUgMTM6MTc6MTAgSVNUIDIwMTY6MTQ1MzcwODAzMDAwNg=="  -X POST http://nucleus.gooru.org/api/nucleus-media/v1/uploads -F file=@"/home/user/myfile.pdf" 
+curl -i  -H "Authorization: Token OTM2NjBiNTItNmZjNi00YmY5LTgyOGQtMzQzNGVhODdmZDAzOlNhdCBKYW4gMzAgMTU6NDM6MTMgSVNUIDIwMTY6MTQ1NDE0ODc5MzM0Ng=="   -X POST http://nucleus.gooru.org/api/nucleus-media/v1/uploads?entity_type=content -F file=@"travel_bag.jpg"
 ```
 
