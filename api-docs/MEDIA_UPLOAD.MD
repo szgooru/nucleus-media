@@ -17,6 +17,11 @@ Features
 | Response Code | 201 Created |
 
 
+**Request param**
+| Name |  Comment |
+|------|--------- |
+|entity_type| accept entity types are content and user |
+
 **Authorization Token**
 ```
 Authorization: Token YjllOTI0NjEtMzFjZC00ZGYxLWEyN2MtNzNjMjZkODI3NmVmOk1vbiBKYW4gMjUgMTM6MTc6MTAgSVNUIDIwMTY6MTQ1MzcwODAzMDAwNg==
