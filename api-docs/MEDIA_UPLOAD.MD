@@ -25,7 +25,7 @@ Authorization: Token YjllOTI0NjEtMzFjZC00ZGYxLWEyN2MtNzNjMjZkODI3NmVmOk1vbiBKYW4
 **Response Body**
 
 ```json
-{"file_name":"27170bb1-19eb-45b1-bd18-839062c6887f.pdf"}
+{"filename":"27170bb1-19eb-45b1-bd18-839062c6887f.pdf"}
 ```
 
 
