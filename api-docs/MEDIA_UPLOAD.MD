@@ -17,10 +17,11 @@ Features
 | Response Code | 201 Created |
 
 
-**Request param**
-| Name |  Comment |
-|------|--------- |
-|entity_type| accept entity types are content and user |
+**Request parameters**
+
+| Name | comments |
+|------------------------|--------|
+| entity_type | supported entity types are content and user |
 
 **Authorization Token**
 ```
