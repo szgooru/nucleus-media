@@ -9,7 +9,7 @@ public class RouteConstants {
   // Helper: Entity name constants
   private static final String UPLOADS = "uploads";
 
-  public static final String API_AUTH_ROUTE = "/api/nucleus/*";
+  public static final String API_AUTH_ROUTE = "/api/nucleus-media/*";
 
   // Upload file = /api/nucleus-media/{version}/uploads
   public static final String EP_FILE_UPLOAD_S3 = API_BASE_ROUTE + UPLOADS;
