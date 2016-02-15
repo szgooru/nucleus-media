@@ -1,6 +1,8 @@
 package org.gooru.media.upload.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gooru.media.upload.constants.ErrorsConstants;
+import org.gooru.media.upload.constants.FileUploadConstants;
 import org.gooru.media.upload.constants.HttpConstants.HttpStatus;
 import org.gooru.media.upload.constants.RouteConstants;
 import org.gooru.media.upload.exception.FileUploadRuntimeException;
@@ -60,6 +62,32 @@ public class UploadValidationUtils extends ErrorsConstants {
       }
     setResponse(errors, response, HttpStatus.BAD_REQUEST.getCode(), ErrorsConstants.UploadErrorType.VALIDATION.getType());
     return response;
+  }
+  
+  public static UploadResponse validateFileUrl(String url, UploadResponse response) {
+    JsonArray errors = new JsonArray();
+    if(!url.startsWith(HTTP)){
+      addError(RouteConstants.URL, EC_VE_400, VE_002, errors);
+    }
+    
+    String extension = StringUtils.substringAfterLast(url, FileUploadConstants.DOT);
+    if(extension == null || extension.isEmpty() ||  !isValidImgType(extension)){
+      addError(RouteConstants.URL, EC_VE_400, VE_003, errors);
+    }
+    
+    setResponse(errors, response, HttpStatus.BAD_REQUEST.getCode(), ErrorsConstants.UploadErrorType.VALIDATION.getType());
+    return response;
+  }
+  
+  private static boolean isValidImgType(String extension){
+    boolean valid = false;
+    for(String type : FileUploadConstants.IMG_TYPES){
+      if(extension.equalsIgnoreCase(type)){
+        valid = true;
+        break;
+      }
+    }
+    return valid;
   }
 
 }

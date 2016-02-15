@@ -10,6 +10,6 @@ public interface MediaUploadService {
     return new MediaUploadServiceImpl();
   }
 
-  UploadResponse uploadFile(RoutingContext routingContext, String uploadLocation);
+  UploadResponse uploadFile(RoutingContext routingContext, String uploadLocation, long fileMaxSize);
 
 }

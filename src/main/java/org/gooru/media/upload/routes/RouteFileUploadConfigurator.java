@@ -28,6 +28,8 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
   public void configureRoutes(Vertx vertx, Router router, JsonObject config) {
     final String s3ConfiFileLocation = config.getString(ConfigConstants.S3_CONFIG_FILE_LOCATION);
     final String uploadLocation = config.getString(ConfigConstants.UPLOAD_LOCATION);
+    final long fileMaxSize = config.getLong(ConfigConstants.MAX_FILE_SIZE);
+
     S3Service.setS3Config(s3ConfiFileLocation);
 
     // upload file to s3
@@ -35,7 +37,7 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
       try {
         long start = System.currentTimeMillis();
 
-        UploadResponse response = uploadService.uploadFile(context, uploadLocation);
+        UploadResponse response = uploadService.uploadFile(context, uploadLocation, fileMaxSize);
 
         LOG.info("Elapsed time to complete upload file to s3 :" + (System.currentTimeMillis() - start) + " ms");
         if (!response.isHasError()) {

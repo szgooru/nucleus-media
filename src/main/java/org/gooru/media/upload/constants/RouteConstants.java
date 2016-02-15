@@ -15,6 +15,8 @@ public class RouteConstants {
   public static final String EP_FILE_UPLOAD_S3 = API_BASE_ROUTE + UPLOADS;
 
   public static final String ENTITY_TYPE = "entity_type";
+  
+  public static final String URL = "url";
 
   public enum UploadEntityType {
     CONTENT("content"),
