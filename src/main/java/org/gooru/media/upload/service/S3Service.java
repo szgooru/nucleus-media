@@ -80,13 +80,13 @@ public final class S3Service {
         S3_LOG.info("S3 Uploaded Id : " + uploadedObject.getKey());
         response.setResponse(res);
         // Delete temp file after the s3 upload
-/*        boolean fileDeleted = Files.deleteIfExists(path);
+        boolean fileDeleted = Files.deleteIfExists(path);
         if (fileDeleted) {
           LOG.info("Temp file have been deleted from local file system : File name {} ", path.getFileName());
         } else {
           LOG.error("File delete from local file system failed : File name {} ", path.getFileName());
         }
-*/      }
+      }
     } catch (Exception e) {
       LOG.error("Upload failed : " + e);
       UploadValidationUtils.rejectOnS3Error(e, response, LOG);
