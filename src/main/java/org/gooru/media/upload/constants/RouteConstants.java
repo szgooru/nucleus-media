@@ -1,10 +1,10 @@
 package org.gooru.media.upload.constants;
 
-public class RouteConstants {
+public final class RouteConstants {
 
   // Helper constants
   private static final String API_VERSION = "v1";
-  private static final String API_BASE_ROUTE = "/api/nucleus-media/" + API_VERSION + "/";
+  private static final String API_BASE_ROUTE = "/api/nucleus-media/" + API_VERSION + '/';
 
   // Helper: Entity name constants
   private static final String UPLOADS = "uploads";
@@ -15,8 +15,11 @@ public class RouteConstants {
   public static final String EP_FILE_UPLOAD_S3 = API_BASE_ROUTE + UPLOADS;
 
   public static final String ENTITY_TYPE = "entity_type";
-  
+
   public static final String URL = "url";
+
+  private RouteConstants() {
+  }
 
   public enum UploadEntityType {
     CONTENT("content"),

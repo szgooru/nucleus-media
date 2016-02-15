@@ -3,7 +3,7 @@ package org.gooru.media.upload.constants;
 /**
  * Constant definition that are used to read configuration
  */
-public class ConfigConstants {
+public final class ConfigConstants {
 
   public static final String HTTP_PORT = "http.port";
 
@@ -17,4 +17,6 @@ public class ConfigConstants {
 
   public static final String MBUS_TIMEOUT = "message.bus.send.timout.seconds";
 
+  private ConfigConstants() {
+  }
 }

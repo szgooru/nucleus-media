@@ -1,6 +1,6 @@
 package org.gooru.media.upload.constants;
 
-public class HttpConstants {
+public final class HttpConstants {
 
   public static final String HEADER_AUTH = "Authorization";
   public static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
@@ -11,7 +11,10 @@ public class HttpConstants {
   public static final String HEADER_CONTENT_TYPE = "Content-Type";
   public static final String HEADER_LOCATION = "Location";
   public static final String TOKEN = "Token";
-  
+
+  private HttpConstants() {
+  }
+
 
   public enum HttpStatus {
 

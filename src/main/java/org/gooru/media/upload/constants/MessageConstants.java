@@ -1,6 +1,6 @@
 package org.gooru.media.upload.constants;
 
-public class MessageConstants {
+public final class MessageConstants {
 
   public static final String MSG_HEADER_OP = "mb.operation";
   public static final String MSG_HEADER_TOKEN = "session.token";
@@ -19,4 +19,6 @@ public class MessageConstants {
   public static final String MSG_HTTP_VALIDATION_ERROR = "http.validation.error";
   public static final String MSG_HTTP_HEADERS = "http.headers";
 
+  private MessageConstants() {
+  }
 }

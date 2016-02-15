@@ -31,10 +31,10 @@ class HttpServerResponseWriter implements ResponseWriter {
     // Then set the headers
     Map<String, String> headers = transformer.transformedHeaders();
     if (headers != null && !headers.isEmpty()) {
-      for (String headerName : headers.keySet()) {
+      for (Map.Entry<String, String> stringStringEntry : headers.entrySet()) {
         // Never accept content-length from others, we do that
-        if (!headerName.equalsIgnoreCase(HttpConstants.HEADER_CONTENT_LENGTH)) {
-          response.putHeader(headerName, headers.get(headerName));
+        if (!stringStringEntry.getKey().equalsIgnoreCase(HttpConstants.HEADER_CONTENT_LENGTH)) {
+          response.putHeader(stringStringEntry.getKey(), stringStringEntry.getValue());
         }
       }
     }
