@@ -29,33 +29,31 @@ public class MediaUploadServiceImpl implements MediaUploadService {
     String fileName = null;
     String entityType = context.request().getParam(RouteConstants.ENTITY_TYPE);
     String url = context.request().getParam(RouteConstants.URL);
-    
-    if(url != null && !url.isEmpty()){
+
+    if (url != null && !url.isEmpty()) {
       response = UploadValidationUtils.validateFileUrl(url, response);
-      if(response.isHasError()){
+      if (response.isHasError()) {
         LOG.error("Upload by url failed");
         return response;
+      } else {
+        fileName = downloadAndSaveFile(url, uploadLocation, fileMaxSize);
+        LOG.debug("File downloaded and saved.  Filename : " + fileName);
       }
-      else{
-       fileName = downloadAndSaveFile(url, uploadLocation, fileMaxSize);
-       LOG.debug("File downloaded and saved.  Filename : " + fileName);
-      }
-    }
-    else {
+    } else {
       Set<FileUpload> files = context.fileUploads();
       if (LOG.isDebugEnabled()) {
         LOG.debug("Context uploaded files : " + files.size());
       }
-      
+
       for (FileUpload f : files) {
         LOG.info("Orginal file name : " + f.fileName() + " Uploaded file name in file system : " + f.uploadedFileName());
         fileName = renameFile(f.fileName(), f.uploadedFileName());
       }
-   }
-   if(fileName != null){
-     return S3Service.getInstance().uploadFileS3(uploadLocation, entityType, fileName, response);
-   } 
-   return null;
+    }
+    if (fileName != null) {
+      return S3Service.getInstance().uploadFileS3(uploadLocation, entityType, fileName, response);
+    }
+    return null;
   }
 
   private String renameFile(String originalFileName, String uploadedFileName) {
@@ -78,21 +76,21 @@ public class MediaUploadServiceImpl implements MediaUploadService {
     return uploadedFileName;
 
   }
-  
-  private static String downloadAndSaveFile(String urlString, String uploadLocation, Long fileMaxSize) {
+
+  private static String downloadAndSaveFile(String fileUrl, String uploadLocation, Long fileMaxSize) {
     try {
-      LOG.debug("File url : " +urlString);
-      String extension = StringUtils.substringAfterLast(urlString, FileUploadConstants.DOT);
+      LOG.debug("File url : " + fileUrl);
+      String extension = StringUtils.substringAfterLast(fileUrl, FileUploadConstants.DOT);
       String fileName = UUID.randomUUID().toString() + FileUploadConstants.DOT + extension;
       File outputFile = new File(uploadLocation + fileName);
-      URL url = new URL(urlString);
+      URL url = new URL(fileUrl);
       FileUtils.copyURLToFile(url, outputFile);
-      
-      if(outputFile.length() > fileMaxSize.intValue()){
+
+      if (outputFile.length() > fileMaxSize.intValue()) {
         outputFile.delete();
         throw new FileUploadRuntimeException("Url file upload failed, file size exceeded 5 MB ", HttpStatus.BAD_REQUEST.getCode());
       }
-      
+
       return fileName;
     } catch (Exception e) {
       LOG.error("DownloadImage failed:exception:", e);

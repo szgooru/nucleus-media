@@ -44,7 +44,7 @@ public final class S3Service {
       props = new Properties();
       FileInputStream is = new FileInputStream(new File(fileLocation));
       props.load(is);
-      LOG.info("S3 config values loaded");
+      LOG.debug("S3 config values loaded");
     } catch (Exception e) {
       LOG.error("Failed to load S3 config values ", e);
     }
@@ -72,8 +72,8 @@ public final class S3Service {
       S3Object uploadedObject = restS3Service.putObject(bucketName, fileObject);
 
       if (uploadedObject != null) {
-        LOG.info("File uploaded to s3 succeeded :   key {} ", uploadedObject.getKey());
-        LOG.info("Elapsed time to complete upload file to s3 in service :" + (System.currentTimeMillis() - start) + " ms");
+        LOG.debug("File uploaded to s3 succeeded :   key {} ", uploadedObject.getKey());
+        LOG.debug("Elapsed time to complete upload file to s3 in service :" + (System.currentTimeMillis() - start) + " ms");
         JsonObject res = new JsonObject();
         res.put(FILE_NAME, uploadedObject.getKey());
         S3_LOG.info("S3 Uploaded Id : " + uploadedObject.getKey());
@@ -81,7 +81,7 @@ public final class S3Service {
         // Delete temp file after the s3 upload
         boolean fileDeleted = Files.deleteIfExists(path);
         if (fileDeleted) {
-          LOG.info("Temp file have been deleted from local file system : File name {} ", path.getFileName());
+          LOG.debug("Temp file have been deleted from local file system : File name {} ", path.getFileName());
         } else {
           LOG.error("File delete from local file system failed : File name {} ", path.getFileName());
         }
@@ -101,7 +101,7 @@ public final class S3Service {
     } else if (entityType.equalsIgnoreCase(RouteConstants.UploadEntityType.USER.name())) {
       bucketName = getS3Config(S3Constants.S3_USER_BUCKET_NAME);
     }
-    LOG.info("S3 upload bucket name {} ", bucketName);
+    LOG.debug("S3 upload bucket name {} ", bucketName);
     return bucketName;
   }
 
