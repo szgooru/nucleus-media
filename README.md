@@ -14,18 +14,11 @@ To understand build related stuff, take a look at **BUILD_README.md**.
 How to do stuff
 ---------------
 
-**Add new configuration**
-* First add the key as constant in ConfigConstants.java
-* Update the media-upload.json to provide a sample value
-* Add file named "s3props.txt", this file should have s3 accesskey, secret and bucket name. 
+**Configuration setup in nucleus-media.json**
 
-* sample s3props file.
-
-	s3.content.bucket.name=[contentbucketname]
-	s3.user.bucket.name=[userbucketname]
-	s3.access.key=[accesskey]
-	s3.secret=[secret]
-
+ - Update the file storage path, json key is "upload.location" it should be NFS storage  file system mount path.
+ 
+ - Create s3 configuaration file inside the cofiguration folder name as  "s3-config.properties", this file should have s3 accesskey, secret and bucket names detail. 
 
 
 
