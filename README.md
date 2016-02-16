@@ -18,7 +18,8 @@ How to do stuff
 
  - Update the file storage path, json key is "upload.location" it should be NFS storage  file system mount path.
  
- - Create s3 configuaration file inside the cofiguration folder name as  "s3-config.properties", this file should have s3 accesskey, secret and bucket names detail. 
+ - ```s3-config.properties``` copy  s3 configuaration template  file  from this repo  to  the cofiguration folder, this file should have s3 accesskey, secret and bucket name details. Replace the placeholder values in the copied property file with the actually values.
+ 
 
 
 
