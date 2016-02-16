@@ -8,9 +8,9 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>media-upload.log</file>
+        <file>nucleus-media.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>nucleus-media.%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- keep 30 days' worth of history -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>
@@ -21,9 +21,9 @@
     </appender>
     
     <appender name="FILE_S3" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>s3-uploaded-ids.log</file>
+        <file>s3-uploaded.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logFile-s3.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>s3-uploaded.%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- keep 30 days' worth of history -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>

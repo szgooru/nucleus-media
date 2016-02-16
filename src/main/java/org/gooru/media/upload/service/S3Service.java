@@ -1,5 +1,8 @@
 package org.gooru.media.upload.service;
 
+import io.vertx.core.Context;
+import io.vertx.core.json.JsonObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
@@ -17,9 +20,6 @@ import org.jets3t.service.security.AWSCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.vertx.core.Context;
-import io.vertx.core.json.JsonObject;
-
 public final class S3Service {
 
   private static final Logger LOG = LoggerFactory.getLogger(S3Service.class);
@@ -28,7 +28,6 @@ public final class S3Service {
   private static Properties props;
   protected Context context;
   private RestS3Service restS3Service;
-  private static S3Service s3Service;
   private static final String FILE_NAME = "filename";
 
   public S3Service() {
@@ -107,11 +106,10 @@ public final class S3Service {
   }
 
   public static S3Service getInstance() {
-    if (s3Service == null) {
-      synchronized (S3Service.class) {
-        s3Service = new S3Service();
-      }
-    }
-    return s3Service;
+    return Holder.INSTANCE;
+  }
+
+  private static class Holder {
+    static final S3Service INSTANCE = new S3Service();
   }
 }

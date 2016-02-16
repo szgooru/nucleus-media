@@ -11,7 +11,6 @@ import java.util.Map;
 class HttpResponseTransformer implements ResponseTransformer {
 
   private static final Logger LOG = LoggerFactory.getLogger(ResponseTransformer.class);
-  private static final String ERROR_TYPE = "type";
   private static final String ERRORS = "errors";
   private final UploadResponse message;
   private boolean transformed = false;
