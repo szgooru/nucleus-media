@@ -1,90 +1,85 @@
 package org.gooru.media.upload.utils;
 
-import org.apache.commons.lang3.StringUtils;
-import static org.gooru.media.upload.constants.ErrorsConstants.*;
+import static org.gooru.media.upload.constants.ErrorsConstants.HTTP;
+import static org.gooru.media.upload.constants.ErrorsConstants.MESSAGE;
+import static org.gooru.media.upload.constants.ErrorsConstants.VE_002;
+import static org.gooru.media.upload.constants.ErrorsConstants.VE_003;
+import static org.gooru.media.upload.constants.ErrorsConstants.VE_004;
+import static org.gooru.media.upload.constants.ErrorsConstants.VE_005;
+import io.vertx.core.json.JsonObject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gooru.media.upload.constants.ErrorsConstants;
 import org.gooru.media.upload.constants.FileUploadConstants;
 import org.gooru.media.upload.constants.HttpConstants.HttpStatus;
 import org.gooru.media.upload.constants.RouteConstants;
 import org.gooru.media.upload.exception.FileUploadRuntimeException;
-import org.gooru.media.upload.responses.models.Error;
-import org.gooru.media.upload.responses.models.UploadError;
 import org.gooru.media.upload.responses.models.UploadResponse;
 import org.jets3t.service.S3ServiceException;
-import org.jets3t.service.ServiceException;
 import org.slf4j.Logger;
-
-import io.vertx.core.json.JsonArray;
 
 public class UploadValidationUtils {
 
-  private static void addError(String fieldName, String errorCode, String message, JsonArray errors) {
-    errors.add(new Error(fieldName, errorCode, message));
-  }
-
-  public static String rejectOnError(String fieldName, String errorCode, String message) {
-    JsonArray errors = new JsonArray();
-    errors.add(new Error(fieldName, errorCode, message));
-    return errors.toString();
+  public static String rejectOnError(String fieldName, String message) {
+    JsonObject error = new JsonObject();
+    error.put(fieldName, message);
+    return error.toString();
   }
 
   public static void rejectOnS3Error(Exception e, UploadResponse response, final Logger logger) {
-    JsonArray errors = new JsonArray();
+    JsonObject error = new JsonObject();
     if (e instanceof S3ServiceException) {
-      addError(FIELD_NA, ((ServiceException) e).getErrorCode(), e.getMessage(), errors);
-      setResponse(errors, response, HttpStatus.ERROR.getCode(), ErrorsConstants.UploadErrorType.SERVER.getType());
+      error.put(MESSAGE, e.getMessage());
+      setResponse(error, response, HttpStatus.ERROR.getCode(), ErrorsConstants.UploadErrorType.SERVER.getType());
     } else {
       logger.error("S3 upload failed " + e);
       throw new FileUploadRuntimeException(e.getMessage(), ErrorsConstants.UploadErrorType.SERVER.getType());
     }
   }
 
-  private static void setResponse(JsonArray errors, UploadResponse response, int httpStatus, String errorType) {
-    if (errors.size() > 0) {
+  private static void setResponse(JsonObject error, UploadResponse response, int httpStatus, String errorType) {
+    if (error != null && error.size() > 0) {
       response.setHasError(true);
-      UploadError validationError = new UploadError();
-      validationError.setErrors(errors);
-      response.setError(validationError);
+      response.setError(error);
       response.setHttpStatus(httpStatus);
     }
   }
 
   public static UploadResponse validateEntityType(String entityType, UploadResponse response) {
-    JsonArray errors = new JsonArray();
-      if (entityType == null || entityType.isEmpty()) {
-        addError(RouteConstants.ENTITY_TYPE, EC_VE_400, VE_004, errors);
-      }
+    JsonObject error = new JsonObject();
+    if (entityType == null || entityType.isEmpty()) {
+      error.put(RouteConstants.ENTITY_TYPE, VE_004);
+    }
 
-      if (entityType != null) {
-        if (!(entityType.equalsIgnoreCase(RouteConstants.UploadEntityType.CONTENT.name()) ||
-          entityType.equalsIgnoreCase(RouteConstants.UploadEntityType.USER.name()))) {
-          addError(RouteConstants.ENTITY_TYPE, EC_VE_400, VE_005, errors);
-        }
+    if (entityType != null) {
+      if (!(entityType.equalsIgnoreCase(RouteConstants.UploadEntityType.CONTENT.name()) || entityType
+          .equalsIgnoreCase(RouteConstants.UploadEntityType.USER.name()))) {
+        error.put(RouteConstants.ENTITY_TYPE, VE_005);
       }
-    setResponse(errors, response, HttpStatus.BAD_REQUEST.getCode(), ErrorsConstants.UploadErrorType.VALIDATION.getType());
+    }
+    setResponse(error, response, HttpStatus.BAD_REQUEST.getCode(), ErrorsConstants.UploadErrorType.VALIDATION.getType());
     return response;
   }
 
   public static UploadResponse validateFileUrl(String url, UploadResponse response) {
-    JsonArray errors = new JsonArray();
-    if(!url.startsWith(HTTP)){
-      addError(RouteConstants.URL, EC_VE_400, VE_002, errors);
+    JsonObject error = new JsonObject();
+    if (!url.startsWith(HTTP)) {
+      error.put(RouteConstants.URL, VE_002);
     }
 
     String extension = StringUtils.substringAfterLast(url, FileUploadConstants.DOT);
-    if(extension == null || extension.isEmpty() ||  !isValidImgType(extension)){
-      addError(RouteConstants.URL, EC_VE_400, VE_003, errors);
+    if (extension == null || extension.isEmpty() || !isValidImgType(extension)) {
+      error.put(RouteConstants.URL, VE_003);
     }
 
-    setResponse(errors, response, HttpStatus.BAD_REQUEST.getCode(), ErrorsConstants.UploadErrorType.VALIDATION.getType());
+    setResponse(error, response, HttpStatus.BAD_REQUEST.getCode(), ErrorsConstants.UploadErrorType.VALIDATION.getType());
     return response;
   }
 
-  private static boolean isValidImgType(String extension){
+  private static boolean isValidImgType(String extension) {
     boolean valid = false;
-    for(String type : FileUploadConstants.IMG_TYPES){
-      if(extension.equalsIgnoreCase(type)){
+    for (String type : FileUploadConstants.IMG_TYPES) {
+      if (extension.equalsIgnoreCase(type)) {
         valid = true;
         break;
       }

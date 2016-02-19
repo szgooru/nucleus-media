@@ -16,9 +16,8 @@ public final class ErrorsConstants {
 
   public static final String VE_006 = "File size should not be more than 5MB, upload file less than 5MB";
 
-  public static final String EC_VE_400 = "VE400";
 
-  public static final String FIELD_NA = "NA";
+  public static final String MESSAGE = "message";
 
   public static final String HTTP = "http";
 

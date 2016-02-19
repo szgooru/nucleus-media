@@ -2,6 +2,7 @@ package org.gooru.media.upload.responses.auth;
 
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
+
 import org.gooru.media.upload.constants.MessageConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

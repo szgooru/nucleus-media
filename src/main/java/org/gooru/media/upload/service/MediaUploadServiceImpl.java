@@ -1,5 +1,8 @@
 package org.gooru.media.upload.service;
 
+import io.vertx.ext.web.FileUpload;
+import io.vertx.ext.web.RoutingContext;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Set;
@@ -15,9 +18,6 @@ import org.gooru.media.upload.responses.models.UploadResponse;
 import org.gooru.media.upload.utils.UploadValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.vertx.ext.web.FileUpload;
-import io.vertx.ext.web.RoutingContext;
 
 public class MediaUploadServiceImpl implements MediaUploadService {
 

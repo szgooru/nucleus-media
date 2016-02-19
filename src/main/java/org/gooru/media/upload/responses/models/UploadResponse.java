@@ -6,7 +6,7 @@ public class UploadResponse extends JsonObject {
 
   private JsonObject response;
 
-  private UploadError error;
+  private JsonObject error;
 
   private boolean hasError;
 
@@ -28,7 +28,6 @@ public class UploadResponse extends JsonObject {
     this.hasError = hasError;
   }
 
-
   public int getHttpStatus() {
     return httpStatus;
   }
@@ -37,11 +36,11 @@ public class UploadResponse extends JsonObject {
     this.httpStatus = httpStatus;
   }
 
-  public UploadError getError() {
+  public JsonObject getError() {
     return error;
   }
 
-  public void setError(UploadError error) {
+  public void setError(JsonObject error) {
     this.error = error;
   }
 

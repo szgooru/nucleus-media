@@ -3,13 +3,14 @@ package org.gooru.media.upload.responses.writers;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
+
+import java.util.Map;
+
 import org.gooru.media.upload.constants.HttpConstants;
 import org.gooru.media.upload.responses.transformers.ResponseTransformer;
 import org.gooru.media.upload.responses.transformers.ResponseTransformerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 class HttpServerResponseWriter implements ResponseWriter {
 

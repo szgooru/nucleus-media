@@ -65,7 +65,7 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
               });
             }
             new RouteResponseUtility().errorResponseHandler(failureRoutingContext, LOG,
-                    UploadValidationUtils.rejectOnError(ErrorsConstants.FIELD_NA, ErrorsConstants.EC_VE_400, ErrorsConstants.VE_006), statusCode);
+                    UploadValidationUtils.rejectOnError(ErrorsConstants.MESSAGE,ErrorsConstants.VE_006), statusCode);
           } else {
             HttpServerResponse response = failureRoutingContext.response();
             if (statusCode == -1) {

@@ -5,6 +5,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
+
 import org.gooru.media.upload.constants.ConfigConstants;
 import org.gooru.media.upload.routes.RouteConfiguration;
 import org.gooru.media.upload.routes.RouteConfigurator;

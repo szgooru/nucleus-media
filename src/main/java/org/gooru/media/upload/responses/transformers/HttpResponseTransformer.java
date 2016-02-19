@@ -1,17 +1,16 @@
 package org.gooru.media.upload.responses.transformers;
 
 import io.vertx.core.json.JsonObject;
-import org.gooru.media.upload.responses.models.UploadError;
+
+import java.util.Map;
+
 import org.gooru.media.upload.responses.models.UploadResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
 class HttpResponseTransformer implements ResponseTransformer {
 
   private static final Logger LOG = LoggerFactory.getLogger(ResponseTransformer.class);
-  private static final String ERRORS = "errors";
   private final UploadResponse message;
   private boolean transformed = false;
   private Map<String, String> headers;
@@ -74,15 +73,12 @@ class HttpResponseTransformer implements ResponseTransformer {
     this.transformed = true;
   }
 
-  private void processErrorTransformation(UploadError messageBody) {
-    JsonObject error = new JsonObject();
-    error.put(ERRORS, messageBody.getErrors());
-    this.httpBody = error.toString();
+  private void processErrorTransformation(JsonObject messageBody) {
+    this.httpBody = messageBody.toString();
   }
 
   private void processSuccessTransformation(JsonObject messageBody) {
     this.httpBody = messageBody.toString();
   }
-
 
 }
