@@ -51,6 +51,7 @@ dependencies {
     compile "io.vertx:vertx-hazelcast:${vertxVersion}"
     compile "io.vertx:vertx-dropwizard-metrics:${vertxVersion}"
     compile "io.vertx:vertx-redis-client:${vertxVersion}"
+    compile "io.vertx:vertx-codegen:${vertxVersion}"
 
     // Other dependencies
     compile "ch.qos.logback:logback-classic:${logbackVersion}"
