@@ -51,7 +51,7 @@ curl -i  -H "Authorization: Token OTM2NjBiNTItNmZjNi00YmY5LTgyOGQtMzQzNGVhODdmZD
 **Upload file with web URL**
 
 ```posh
-curl -i  -H "Authorization: Token OTM2NjBiNTItNmZjNi00YmY5LTgyOGQtMzQzNGVhODdmZDAzOlNhdCBKYW4gMzAgMTU6NDM6MTMgSVNUIDIwMTY6MTQ1NDE0ODc5MzM0Ng=="   -X POST http://nucleus.gooru.org/api/nucleus-media/v1/uploads?entity_type=content&url=http%3A%2F%2Fimages.all-free-download.com%2Fimages%2Fgraphiclarge%2Fnatural_beauty_of_hd_picture_5_166088.jpg"
+curl -i  -H "Authorization: Token OTM2NjBiNTItNmZjNi00YmY5LTgyOGQtMzQzNGVhODdmZDAzOlNhdCBKYW4gMzAgMTU6NDM6MTMgSVNUIDIwMTY6MTQ1NDE0ODc5MzM0Ng==" -d "entity_type=content&url=http://www.joomlaworks.net/images/demos/galleries/abstract/7.jpg"  -X POST http://nucleus.gooru.org/api/nucleus-media/v1/uploads
 ```
 
 
