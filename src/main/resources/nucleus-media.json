@@ -3,8 +3,12 @@
   "http.port" : 8080,
   "max.file.size.bytes" : 5242880,
   "upload.location" : "/mnt/nfs/repository/",
-  "s3.config.file.location":"/opt/nucleus/conf/s3-config.properties",
-  "s3.host":"s3-us-west-1.amazonaws.com",
+  "s3.config": {
+      "s3.access.key" : "[ACCESS_KEY]",
+      "s3.secret" : "[SECRET_KEY]",
+      "s3.user.bucket.name" : "[USER_BUCKET_NAME]",
+      "s3.content.bucket.name" : "[CONTENT_BUCKET_NAME]"
+  },
   "redis.config" : {
     "host" : "localhost",
     "port" : 6379,
