@@ -33,7 +33,7 @@ How to do stuff
 
  - Update the file storage path, json key is "upload.location" it should be NFS storage  file system mount path.
  
- - ```s3-config.properties``` copy  s3 configuaration template  file  from this repo  to  the cofiguration folder, this file should have s3 accesskey, secret and bucket name details. Replace the placeholder values in the copied property file with the actually values.
+ - Update the s3 configuration settings by replacing the placeholder values with the actual configuration values.
  
 
 
