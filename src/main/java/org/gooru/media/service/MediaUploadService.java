@@ -6,10 +6,10 @@ import org.gooru.media.responses.models.UploadResponse;
 
 public interface MediaUploadService {
 
-  static MediaUploadService instance() {
-    return new MediaUploadServiceImpl();
-  }
+    static MediaUploadService instance() {
+        return new MediaUploadServiceImpl();
+    }
 
-  UploadResponse uploadFile(RoutingContext routingContext, String uploadLocation, long fileMaxSize);
+    UploadResponse uploadFile(RoutingContext routingContext, String uploadLocation, long fileMaxSize);
 
 }

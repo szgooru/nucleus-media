@@ -10,24 +10,26 @@ import org.slf4j.Logger;
 
 public class RouteResponseUtility {
 
-  public void responseHandler(final RoutingContext routingContext, final AsyncResult<Object> reply, final Logger LOG) {
-    if (reply.succeeded()) {
-      new ResponseWriterBuilder(routingContext, reply).build().writeResponse();
-    } else {
-      int statusCode = routingContext.statusCode();
-      if (statusCode == HttpStatus.TOO_LARGE.getCode()) {
-        routingContext.response().setStatusCode(HttpStatus.TOO_LARGE.getCode()).end(HttpStatus.TOO_LARGE.getMessage());
-      } else {
-        LOG.error("Not able to send message", reply.cause());
-        routingContext.response().setStatusCode(500).end();
-      }
+    public void responseHandler(final RoutingContext routingContext, final AsyncResult<Object> reply, final Logger LOG) {
+        if (reply.succeeded()) {
+            new ResponseWriterBuilder(routingContext, reply).build().writeResponse();
+        } else {
+            int statusCode = routingContext.statusCode();
+            if (statusCode == HttpStatus.TOO_LARGE.getCode()) {
+                routingContext.response().setStatusCode(HttpStatus.TOO_LARGE.getCode())
+                    .end(HttpStatus.TOO_LARGE.getMessage());
+            } else {
+                LOG.error("Not able to send message", reply.cause());
+                routingContext.response().setStatusCode(500).end();
+            }
 
+        }
     }
-  }
 
-  public void errorResponseHandler(final RoutingContext routingContext, final Logger LOG, final String response, final int statusCode) {
-    JsonObject error = new JsonObject(response);
-    routingContext.response().setStatusCode(statusCode);
-    routingContext.response().end(error.toString());
-  }
+    public void errorResponseHandler(final RoutingContext routingContext, final Logger LOG, final String response,
+        final int statusCode) {
+        JsonObject error = new JsonObject(response);
+        routingContext.response().setStatusCode(statusCode);
+        routingContext.response().end(error.toString());
+    }
 }

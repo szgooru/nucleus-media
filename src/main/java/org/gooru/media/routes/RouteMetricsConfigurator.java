@@ -8,22 +8,21 @@ import io.vertx.ext.web.Router;
 import org.gooru.media.constants.ConfigConstants;
 import org.gooru.media.constants.MessagebusEndpoints;
 
-
 class RouteMetricsConfigurator implements RouteConfigurator {
 
+    @Override
+    public void configureRoutes(Vertx vertx, Router router, JsonObject config) {
 
-  @Override
-  public void configureRoutes(Vertx vertx, Router router, JsonObject config) {
+        final MetricsService metricsService = MetricsService.create(vertx);
 
-    final MetricsService metricsService = MetricsService.create(vertx);
+        // Send a metrics events as per period defined, once we convert it to
+        // milliseconds
+        final int metricsPeriodicitySeconds = config.getInteger(ConfigConstants.METRICS_PERIODICITY);
 
-    // Send a metrics events as per period defined, once we convert it to milliseconds
-    final int metricsPeriodicitySeconds = config.getInteger(ConfigConstants.METRICS_PERIODICITY);
-
-    vertx.setPeriodic(metricsPeriodicitySeconds * 1000, t -> {
-      JsonObject metrics = metricsService.getMetricsSnapshot(vertx);
-      vertx.eventBus().publish(MessagebusEndpoints.MBEP_METRICS, metrics);
-    });
-  }
+        vertx.setPeriodic(metricsPeriodicitySeconds * 1000, t -> {
+            JsonObject metrics = metricsService.getMetricsSnapshot(vertx);
+            vertx.eventBus().publish(MessagebusEndpoints.MBEP_METRICS, metrics);
+        });
+    }
 
 }

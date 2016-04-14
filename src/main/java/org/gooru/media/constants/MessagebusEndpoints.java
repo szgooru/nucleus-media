@@ -5,11 +5,11 @@ package org.gooru.media.constants;
  * addresses on which the consumers are listening.
  */
 public class MessagebusEndpoints {
-  public static final String MBEP_AUTH = "org.gooru.nucleus.media.message.bus.auth";
-  public static final String MBEP_METRICS = "org.gooru.nucleus.media.message.bus.metrics";
-  public static final String MBEP_CONVERTER = "org.gooru.nucleus.media.message.bus.converter";
-  
-  private MessagebusEndpoints() { 
-    throw new AssertionError();
-  }
+    public static final String MBEP_AUTH = "org.gooru.nucleus.media.message.bus.auth";
+    public static final String MBEP_METRICS = "org.gooru.nucleus.media.message.bus.metrics";
+    public static final String MBEP_CONVERTER = "org.gooru.nucleus.media.message.bus.converter";
+
+    private MessagebusEndpoints() {
+        throw new AssertionError();
+    }
 }

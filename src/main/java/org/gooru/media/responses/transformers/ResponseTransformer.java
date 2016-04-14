@@ -1,16 +1,15 @@
 package org.gooru.media.responses.transformers;
 
-
 import java.util.Map;
 
 public interface ResponseTransformer {
 
-  void transform();
+    void transform();
 
-  String transformedBody();
+    String transformedBody();
 
-  Map<String, String> transformedHeaders();
+    Map<String, String> transformedHeaders();
 
-  int transformedStatus();
+    int transformedStatus();
 
 }

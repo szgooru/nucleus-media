@@ -9,17 +9,17 @@ import org.gooru.media.constants.ConfigConstants;
 
 class RouteGlobalConfigurator implements RouteConfigurator {
 
-  @Override
-  public void configureRoutes(Vertx vertx, Router router, JsonObject config) {
+    @Override
+    public void configureRoutes(Vertx vertx, Router router, JsonObject config) {
 
-    final long bodyLimit = config.getLong(ConfigConstants.MAX_FILE_SIZE);
+        final long bodyLimit = config.getLong(ConfigConstants.MAX_FILE_SIZE);
 
-    final String uploadLocation = config.getString(ConfigConstants.UPLOAD_LOCATION);
+        final String uploadLocation = config.getString(ConfigConstants.UPLOAD_LOCATION);
 
-    BodyHandler bodyHandler = BodyHandler.create().setBodyLimit(bodyLimit).setUploadsDirectory(uploadLocation);
+        BodyHandler bodyHandler = BodyHandler.create().setBodyLimit(bodyLimit).setUploadsDirectory(uploadLocation);
 
-    router.route().handler(bodyHandler);
+        router.route().handler(bodyHandler);
 
-  }
+    }
 
 }
