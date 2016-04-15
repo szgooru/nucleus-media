@@ -4,6 +4,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.gooru.media.constants.HttpConstants;
@@ -44,7 +45,7 @@ class HttpServerResponseWriter implements ResponseWriter {
             ((transformer.transformedBody() != null) && (!transformer.transformedBody().isEmpty())) ? transformer
                 .transformedBody() : null;
         if (responseBody != null) {
-            response.putHeader(HttpConstants.HEADER_CONTENT_LENGTH, Integer.toString(responseBody.length()));
+            response.putHeader(HttpConstants.HEADER_CONTENT_LENGTH, Integer.toString(responseBody.getBytes(StandardCharsets.UTF_8).length));
             response.end(responseBody);
         } else {
             response.end();
