@@ -40,7 +40,7 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
                         LOG.info("Elapsed time to complete upload file to s3 :" + (System.currentTimeMillis() - start)
                             + " ms");
                         if (!response.isHasError()) {
-                            response.setHttpStatus(HttpStatus.SUCCESS.getCode());
+                            response.setHttpStatus(HttpStatus.CREATED.getCode());
                         }
                         future.complete(response);
                     } catch (Exception e) {
