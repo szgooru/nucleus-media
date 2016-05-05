@@ -1,15 +1,15 @@
 package org.gooru.media.bootstrap;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.http.HttpServer;
-import io.vertx.ext.web.Router;
-
 import org.gooru.media.constants.ConfigConstants;
 import org.gooru.media.routes.RouteConfiguration;
 import org.gooru.media.routes.RouteConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.http.HttpServer;
+import io.vertx.ext.web.Router;
 
 public class FileUploadVerticle extends AbstractVerticle {
 
@@ -30,7 +30,9 @@ public class FileUploadVerticle extends AbstractVerticle {
             if (res.succeeded()) {
                 LOG.info("Deploying AuthVerticle... " + res.result());
             } else {
-                LOG.info("Deployment of AuthVerticle failed !" + res.cause());
+                LOG.error("Deployment of AuthVerticle failed !" + res.cause());
+                // should not continue with deployment
+                Runtime.getRuntime().halt(1);
             }
         });
 
@@ -52,10 +54,10 @@ public class FileUploadVerticle extends AbstractVerticle {
                 // may have us blocked on other threads that we may have
                 // spawned, so we need to use
                 // brute force here
-            LOG.error("Not able to start HTTP Server", result.cause());
-            Runtime.getRuntime().halt(1);
-        }
-    }   );
+                LOG.error("Not able to start HTTP Server", result.cause());
+                Runtime.getRuntime().halt(1);
+            }
+        });
 
     }
 

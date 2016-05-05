@@ -1,8 +1,5 @@
 package org.gooru.media.service;
 
-import io.vertx.ext.web.FileUpload;
-import io.vertx.ext.web.RoutingContext;
-
 import java.io.File;
 import java.net.URL;
 import java.util.Set;
@@ -11,14 +8,17 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.gooru.media.constants.FileUploadConstants;
-import org.gooru.media.constants.RouteConstants;
 import org.gooru.media.constants.HttpConstants.HttpStatus;
+import org.gooru.media.constants.RouteConstants;
 import org.gooru.media.exception.FileUploadRuntimeException;
 import org.gooru.media.infra.S3Client;
 import org.gooru.media.responses.models.UploadResponse;
 import org.gooru.media.utils.UploadValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.vertx.ext.web.FileUpload;
+import io.vertx.ext.web.RoutingContext;
 
 public class MediaUploadServiceImpl implements MediaUploadService {
 
@@ -49,8 +49,8 @@ public class MediaUploadServiceImpl implements MediaUploadService {
             }
 
             for (FileUpload f : files) {
-                LOG.info("Orginal file name : " + f.fileName() + " Uploaded file name in file system : "
-                    + f.uploadedFileName());
+                LOG.info("Orginal file name : " + f.fileName() + " Uploaded file name in file system : " + f
+                    .uploadedFileName());
                 fileName = renameFile(f.fileName(), f.uploadedFileName());
             }
         }

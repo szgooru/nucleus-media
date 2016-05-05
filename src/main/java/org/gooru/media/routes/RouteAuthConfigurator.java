@@ -1,21 +1,17 @@
 package org.gooru.media.routes;
 
+import org.gooru.media.constants.*;
+import org.gooru.media.responses.auth.AuthPrefsResponseHolderBuilder;
+import org.gooru.media.responses.auth.AuthResponseHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.handler.codec.http.HttpMethod;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
-
-import org.gooru.media.constants.ConfigConstants;
-import org.gooru.media.constants.HttpConstants;
-import org.gooru.media.constants.MessageConstants;
-import org.gooru.media.constants.MessagebusEndpoints;
-import org.gooru.media.constants.RouteConstants;
-import org.gooru.media.responses.auth.AuthPrefsResponseHolderBuilder;
-import org.gooru.media.responses.auth.AuthResponseHolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RouteAuthConfigurator implements RouteConfigurator {
 
@@ -43,44 +39,36 @@ public class RouteAuthConfigurator implements RouteConfigurator {
             } else {
                 // If the session token is present, we send it to Message Bus
                 // for validation
-                DeliveryOptions options =
-                    new DeliveryOptions().setSendTimeout(mbusTimeout * 1000)
-                        .addHeader(MessageConstants.MSG_HEADER_OP, MessageConstants.MSG_OP_AUTH)
-                        .addHeader(MessageConstants.MSG_HEADER_TOKEN, sessionToken);
-                eBus.send(
-                    MessagebusEndpoints.MBEP_AUTH,
-                    null,
-                    options,
-                    reply -> {
-                        if (reply.succeeded()) {
-                            AuthResponseHolder responseHolder =
-                                new AuthPrefsResponseHolderBuilder(reply.result()).build();
-                            // Message header would indicate whether the auth
-                            // was successful or not. In addition, successful
-                            // auth may have been
-                            // for anonymous user. We allow only GET request for
-                            // anonymous user (since we do not support head,
-                            // trace, options etc so far)
-                            if (responseHolder.isAuthorized()) {
-                                if (!routingContext.request().method().name().equals(HttpMethod.GET.name())
-                                    && responseHolder.isAnonymous()) {
-                                    routingContext.response()
-                                        .setStatusCode(HttpConstants.HttpStatus.FORBIDDEN.getCode())
-                                        .setStatusMessage(HttpConstants.HttpStatus.FORBIDDEN.getMessage()).end();
-                                } else {
-                                    LOG.debug("User authenticated, Fowarding request to next route.. ");
-                                    routingContext.next();
-                                }
+                DeliveryOptions options = new DeliveryOptions().setSendTimeout(mbusTimeout * 1000)
+                    .addHeader(MessageConstants.MSG_HEADER_OP, MessageConstants.MSG_OP_AUTH)
+                    .addHeader(MessageConstants.MSG_HEADER_TOKEN, sessionToken);
+                eBus.send(MessagebusEndpoints.MBEP_AUTH, null, options, reply -> {
+                    if (reply.succeeded()) {
+                        AuthResponseHolder responseHolder = new AuthPrefsResponseHolderBuilder(reply.result()).build();
+                        // Message header would indicate whether the auth
+                        // was successful or not. In addition, successful
+                        // auth may have been
+                        // for anonymous user. We allow only GET request for
+                        // anonymous user (since we do not support head,
+                        // trace, options etc so far)
+                        if (responseHolder.isAuthorized()) {
+                            if (!routingContext.request().method().name().equals(HttpMethod.GET.name())
+                                && responseHolder.isAnonymous()) {
+                                routingContext.response().setStatusCode(HttpConstants.HttpStatus.FORBIDDEN.getCode())
+                                    .setStatusMessage(HttpConstants.HttpStatus.FORBIDDEN.getMessage()).end();
                             } else {
-                                routingContext.response()
-                                    .setStatusCode(HttpConstants.HttpStatus.UNAUTHORIZED.getCode())
-                                    .setStatusMessage(HttpConstants.HttpStatus.UNAUTHORIZED.getMessage()).end();
+                                LOG.debug("User authenticated, Fowarding request to next route.. ");
+                                routingContext.next();
                             }
                         } else {
-                            LOG.error("Not able to send message", reply.cause());
-                            routingContext.response().setStatusCode(HttpConstants.HttpStatus.ERROR.getCode()).end();
+                            routingContext.response().setStatusCode(HttpConstants.HttpStatus.UNAUTHORIZED.getCode())
+                                .setStatusMessage(HttpConstants.HttpStatus.UNAUTHORIZED.getMessage()).end();
                         }
-                    });
+                    } else {
+                        LOG.error("Not able to send message", reply.cause());
+                        routingContext.response().setStatusCode(HttpConstants.HttpStatus.ERROR.getCode()).end();
+                    }
+                });
             }
         });
 

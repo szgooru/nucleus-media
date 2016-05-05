@@ -1,17 +1,21 @@
 package org.gooru.media.utils;
 
+import org.gooru.media.constants.MessageConstants;
+
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
-import org.gooru.media.constants.MessageConstants;
-
 /**
  * Created by ashish on 30/12/15.
  */
-public class RouteRequestUtility {
+public final class RouteRequestUtility {
 
-    public JsonObject getBodyForMessage(RoutingContext routingContext) {
+    private RouteRequestUtility() {
+        throw new AssertionError();
+    }
+
+    public static JsonObject getBodyForMessage(RoutingContext routingContext) {
         JsonObject result = new JsonObject();
         JsonObject httpBody = null;
         if (!routingContext.request().method().name().equals(HttpMethod.GET.name())) {

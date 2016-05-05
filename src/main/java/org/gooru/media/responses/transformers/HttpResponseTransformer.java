@@ -1,12 +1,12 @@
 package org.gooru.media.responses.transformers;
 
-import io.vertx.core.json.JsonObject;
-
 import java.util.Map;
 
 import org.gooru.media.responses.models.UploadResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.vertx.core.json.JsonObject;
 
 class HttpResponseTransformer implements ResponseTransformer {
 

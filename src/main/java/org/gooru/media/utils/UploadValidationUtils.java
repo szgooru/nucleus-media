@@ -1,24 +1,24 @@
 package org.gooru.media.utils;
 
-import static org.gooru.media.constants.ErrorsConstants.HTTP;
-import static org.gooru.media.constants.ErrorsConstants.MESSAGE;
-import static org.gooru.media.constants.ErrorsConstants.VE_002;
-import static org.gooru.media.constants.ErrorsConstants.VE_003;
-import static org.gooru.media.constants.ErrorsConstants.VE_004;
-import static org.gooru.media.constants.ErrorsConstants.VE_005;
-import io.vertx.core.json.JsonObject;
+import static org.gooru.media.constants.ErrorsConstants.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.gooru.media.constants.ErrorsConstants;
 import org.gooru.media.constants.FileUploadConstants;
-import org.gooru.media.constants.RouteConstants;
 import org.gooru.media.constants.HttpConstants.HttpStatus;
+import org.gooru.media.constants.RouteConstants;
 import org.gooru.media.exception.FileUploadRuntimeException;
 import org.gooru.media.responses.models.UploadResponse;
 import org.jets3t.service.S3ServiceException;
 import org.slf4j.Logger;
 
-public class UploadValidationUtils {
+import io.vertx.core.json.JsonObject;
+
+public final class UploadValidationUtils {
+
+    private UploadValidationUtils() {
+        throw new AssertionError();
+    }
 
     public static String rejectOnError(String fieldName, String message) {
         JsonObject error = new JsonObject();

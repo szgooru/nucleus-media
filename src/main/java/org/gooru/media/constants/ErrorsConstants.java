@@ -26,7 +26,8 @@ public final class ErrorsConstants {
 
     public enum UploadErrorType {
 
-        VALIDATION("validation"), SERVER("server");
+        VALIDATION("validation"),
+        SERVER("server");
 
         private final String type;
 

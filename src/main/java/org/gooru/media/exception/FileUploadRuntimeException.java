@@ -3,8 +3,8 @@ package org.gooru.media.exception;
 public class FileUploadRuntimeException extends RuntimeException {
 
     /**
-   *
-   */
+     *
+     */
     private static final long serialVersionUID = 3022759830631765476L;
 
     private int statusCode;

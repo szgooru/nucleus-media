@@ -4,11 +4,11 @@ import org.gooru.media.bootstrap.shutdown.Finalizer;
 import org.gooru.media.bootstrap.startup.Initializer;
 import org.gooru.media.constants.ConfigConstants;
 
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 
 public final class RedisClient implements Initializer, Finalizer {
 
@@ -23,9 +23,8 @@ public final class RedisClient implements Initializer, Finalizer {
         jedisPoolConfig.setMinIdle(1);
         jedisPoolConfig.setMaxWaitMillis(30000);
         jedisPoolConfig.setTestOnBorrow(true);
-        pool =
-            new JedisPool(jedisPoolConfig, redisConfig.getString(ConfigConstants.HOST),
-                redisConfig.getInteger(ConfigConstants.PORT));
+        pool = new JedisPool(jedisPoolConfig, redisConfig.getString(ConfigConstants.HOST),
+            redisConfig.getInteger(ConfigConstants.PORT));
     }
 
     public static RedisClient instance() {
@@ -124,7 +123,7 @@ public final class RedisClient implements Initializer, Finalizer {
         }
     }
 
-    private static class Holder {
+    private static final class Holder {
         private static final RedisClient INSTANCE = new RedisClient();
     }
 }

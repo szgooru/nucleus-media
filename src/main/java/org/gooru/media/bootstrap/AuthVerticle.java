@@ -1,20 +1,20 @@
 package org.gooru.media.bootstrap;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
-import io.vertx.core.eventbus.DeliveryOptions;
-import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.json.JsonObject;
-
 import org.gooru.media.bootstrap.shutdown.Finalizer;
 import org.gooru.media.bootstrap.shutdown.Finalizers;
-import org.gooru.media.bootstrap.startup.Initializers;
 import org.gooru.media.bootstrap.startup.Initializer;
+import org.gooru.media.bootstrap.startup.Initializers;
 import org.gooru.media.constants.MessageConstants;
 import org.gooru.media.constants.MessagebusEndpoints;
 import org.gooru.media.infra.RedisClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
+import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonObject;
 
 public class AuthVerticle extends AbstractVerticle {
     private static final Logger LOG = LoggerFactory.getLogger(AuthVerticle.class);
@@ -22,9 +22,7 @@ public class AuthVerticle extends AbstractVerticle {
 
     @Override
     public void start(Future<Void> voidFuture) throws Exception {
-        vertx.executeBlocking(blockingFuture -> {
-            startApplication();
-        }, future -> {
+        vertx.executeBlocking(blockingFuture -> startApplication(), future -> {
             if (future.succeeded()) {
                 voidFuture.complete();
             } else {
@@ -32,28 +30,23 @@ public class AuthVerticle extends AbstractVerticle {
             }
         });
         EventBus eb = vertx.eventBus();
-        eb.localConsumer(
-            MessagebusEndpoints.MBEP_AUTH,
-            message -> {
-                LOG.debug("Received message: " + message.body());
-                vertx.executeBlocking(
-                    future -> {
-                        JsonObject result = getAccessToken(message.headers().get(MessageConstants.MSG_HEADER_TOKEN));
-                        future.complete(result);
-                    },
-                    res -> {
-                        if (res.result() != null) {
-                            JsonObject result = (JsonObject) res.result();
-                            DeliveryOptions options =
-                                new DeliveryOptions().addHeader(MessageConstants.MSG_OP_STATUS,
-                                    MessageConstants.MSG_OP_STATUS_SUCCESS);
-                            message.reply(result, options);
-                        } else {
-                            message.reply(null);
-                        }
-                    });
+        eb.localConsumer(MessagebusEndpoints.MBEP_AUTH, message -> {
+            LOG.debug("Received message: " + message.body());
+            vertx.executeBlocking(future -> {
+                JsonObject result = getAccessToken(message.headers().get(MessageConstants.MSG_HEADER_TOKEN));
+                future.complete(result);
+            }, res -> {
+                if (res.result() != null) {
+                    JsonObject result = (JsonObject) res.result();
+                    DeliveryOptions options = new DeliveryOptions()
+                        .addHeader(MessageConstants.MSG_OP_STATUS, MessageConstants.MSG_OP_STATUS_SUCCESS);
+                    message.reply(result, options);
+                } else {
+                    message.reply(null);
+                }
+            });
 
-            }).completionHandler(result -> {
+        }).completionHandler(result -> {
             if (result.succeeded()) {
                 LOG.info("Auth end point ready to listen");
             } else {

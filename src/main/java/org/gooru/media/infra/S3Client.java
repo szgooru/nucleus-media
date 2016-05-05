@@ -1,9 +1,5 @@
 package org.gooru.media.infra;
 
-import io.vertx.core.Context;
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,6 +15,10 @@ import org.jets3t.service.security.AWSCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.vertx.core.Context;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+
 public final class S3Client implements Initializer {
 
     private static final Logger LOG = LoggerFactory.getLogger(S3Client.class);
@@ -33,9 +33,8 @@ public final class S3Client implements Initializer {
         synchronized (Holder.INSTANCE) {
             try {
                 this.config = config.getJsonObject(ConfigConstants.S3_CONFIG);
-                AWSCredentials awsCredentials =
-                    new AWSCredentials(this.config.getString(ConfigConstants.S3_ACCESS_KEY),
-                        this.config.getString(ConfigConstants.S3_SECRET));
+                AWSCredentials awsCredentials = new AWSCredentials(this.config.getString(ConfigConstants.S3_ACCESS_KEY),
+                    this.config.getString(ConfigConstants.S3_SECRET));
                 restS3Service = new RestS3Service(awsCredentials);
             } catch (Exception e) {
                 LOG.error("S3 rest service start failed ! ", e);
@@ -43,8 +42,8 @@ public final class S3Client implements Initializer {
         }
     }
 
-    public UploadResponse
-        uploadFileS3(String fileLocation, String entityType, String fileName, UploadResponse response) {
+    public UploadResponse uploadFileS3(String fileLocation, String entityType, String fileName,
+        UploadResponse response) {
 
         try {
             UploadValidationUtils.validateEntityType(entityType, response);
@@ -63,8 +62,9 @@ public final class S3Client implements Initializer {
 
             if (uploadedObject != null) {
                 LOG.debug("File uploaded to s3 succeeded :   key {} ", uploadedObject.getKey());
-                LOG.debug("Elapsed time to complete upload file to s3 in service :"
-                    + (System.currentTimeMillis() - start) + " ms");
+                LOG.debug(
+                    "Elapsed time to complete upload file to s3 in service :" + (System.currentTimeMillis() - start)
+                        + " ms");
                 JsonObject res = new JsonObject();
                 res.put(FILE_NAME, uploadedObject.getKey());
                 S3_LOG.info("S3 Uploaded Id : " + uploadedObject.getKey());
@@ -100,7 +100,7 @@ public final class S3Client implements Initializer {
         return Holder.INSTANCE;
     }
 
-    private static class Holder {
+    private static final class Holder {
         static final S3Client INSTANCE = new S3Client();
     }
 }

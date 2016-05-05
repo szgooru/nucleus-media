@@ -22,7 +22,8 @@ public final class RouteConstants {
     }
 
     public enum UploadEntityType {
-        CONTENT("content"), USER("user");
+        CONTENT("content"),
+        USER("user");
 
         private final String message;
 

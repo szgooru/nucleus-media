@@ -1,16 +1,21 @@
 package org.gooru.media.utils;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RoutingContext;
-
 import org.gooru.media.constants.HttpConstants.HttpStatus;
 import org.gooru.media.responses.writers.ResponseWriterBuilder;
 import org.slf4j.Logger;
 
-public class RouteResponseUtility {
+import io.vertx.core.AsyncResult;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.RoutingContext;
 
-    public void responseHandler(final RoutingContext routingContext, final AsyncResult<Object> reply, final Logger LOG) {
+public final class RouteResponseUtility {
+
+    private RouteResponseUtility() {
+        throw new AssertionError();
+    }
+
+    public static void responseHandler(final RoutingContext routingContext, final AsyncResult<Object> reply,
+        final Logger LOG) {
         if (reply.succeeded()) {
             new ResponseWriterBuilder(routingContext, reply).build().writeResponse();
         } else {
@@ -26,8 +31,8 @@ public class RouteResponseUtility {
         }
     }
 
-    public void errorResponseHandler(final RoutingContext routingContext, final Logger LOG, final String response,
-        final int statusCode) {
+    public static void errorResponseHandler(final RoutingContext routingContext, final Logger LOG,
+        final String response, final int statusCode) {
         JsonObject error = new JsonObject(response);
         routingContext.response().setStatusCode(statusCode);
         routingContext.response().end(error.toString());
