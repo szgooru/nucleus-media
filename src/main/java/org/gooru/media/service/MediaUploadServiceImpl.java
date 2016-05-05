@@ -2,6 +2,7 @@ package org.gooru.media.service;
 
 import java.io.File;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -49,8 +50,8 @@ public class MediaUploadServiceImpl implements MediaUploadService {
             }
 
             for (FileUpload f : files) {
-                LOG.info("Orginal file name : " + f.fileName() + " Uploaded file name in file system : " + f
-                    .uploadedFileName());
+                LOG.info("Orginal file name : " + f.fileName() + " Uploaded file name in file system : "
+                    + f.uploadedFileName());
                 fileName = renameFile(f.fileName(), f.uploadedFileName());
             }
         }
@@ -88,8 +89,10 @@ public class MediaUploadServiceImpl implements MediaUploadService {
             String fileName = UUID.randomUUID().toString() + FileUploadConstants.DOT + extension;
             File outputFile = new File(uploadLocation + fileName);
             URL url = new URL(fileUrl);
-            FileUtils.copyURLToFile(url, outputFile);
-
+            URLConnection conn = url.openConnection();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0");
+            conn.connect();
+            FileUtils.copyInputStreamToFile(conn.getInputStream(), outputFile);
             if (outputFile.length() > fileMaxSize.intValue()) {
                 outputFile.delete();
                 throw new FileUploadRuntimeException("Url file upload failed, file size exceeded 5 MB ",
