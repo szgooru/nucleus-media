@@ -90,6 +90,8 @@ public class MediaUploadServiceImpl implements MediaUploadService {
             File outputFile = new File(uploadLocation + fileName);
             URL url = new URL(fileUrl);
             URLConnection conn = url.openConnection();
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(10000);
             conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0");
             conn.connect();
             FileUtils.copyInputStreamToFile(conn.getInputStream(), outputFile);
