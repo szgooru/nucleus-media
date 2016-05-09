@@ -26,7 +26,7 @@ public class AuthVerticle extends AbstractVerticle {
             if (future.succeeded()) {
                 voidFuture.complete();
             } else {
-                voidFuture.fail("Not able to initialize the auth handlers machiners properly");
+                voidFuture.fail("Not able to initialize the auth handlers machinery properly");
             }
         });
         EventBus eb = vertx.eventBus();
