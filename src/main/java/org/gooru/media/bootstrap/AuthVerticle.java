@@ -22,13 +22,6 @@ public class AuthVerticle extends AbstractVerticle {
 
     @Override
     public void start(Future<Void> voidFuture) throws Exception {
-        vertx.executeBlocking(blockingFuture -> startApplication(), future -> {
-            if (future.succeeded()) {
-                voidFuture.complete();
-            } else {
-                voidFuture.fail("Not able to initialize the auth handlers machinery properly");
-            }
-        });
         EventBus eb = vertx.eventBus();
         eb.localConsumer(MessagebusEndpoints.MBEP_AUTH, message -> {
             LOG.debug("Received message: " + message.body());
@@ -48,9 +41,19 @@ public class AuthVerticle extends AbstractVerticle {
 
         }).completionHandler(result -> {
             if (result.succeeded()) {
-                LOG.info("Auth end point ready to listen");
+                vertx.executeBlocking(blockingFuture -> startApplication(blockingFuture), future -> {
+                    if (future.succeeded()) {
+                        LOG.debug("Application component initialization successful");
+                        LOG.info("Auth end point ready to listen");
+                        voidFuture.complete();
+                    } else {
+                        LOG.debug("Application component initialization failed");
+                        voidFuture.fail("Not able to initialize the auth handlers machinery properly");
+                    }
+                });
             } else {
                 LOG.error("Error registering the auth handler. Halting the Auth machinery");
+                voidFuture.fail(result.cause());
                 Runtime.getRuntime().halt(1);
             }
         });
@@ -62,14 +65,16 @@ public class AuthVerticle extends AbstractVerticle {
         super.stop();
     }
 
-    private void startApplication() {
+    private void startApplication(Future<Object> blockingFuture) {
         Initializers initializers = new Initializers();
         try {
             for (Initializer initializer : initializers) {
                 initializer.initializeComponent(vertx, config());
             }
+            blockingFuture.complete();
         } catch (IllegalStateException ie) {
             LOG.error("Error initializing application", ie);
+            blockingFuture.fail(ie);
             Runtime.getRuntime().halt(1);
         }
     }
