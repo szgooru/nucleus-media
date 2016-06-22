@@ -76,7 +76,7 @@ public class MediaUploadServiceImpl implements MediaUploadService {
             }
 
         } catch (Exception e) {
-            LOG.error("Rename file name failed : " + e);
+            LOG.error("Rename file name failed : ", e);
         }
         return uploadedFileName;
 

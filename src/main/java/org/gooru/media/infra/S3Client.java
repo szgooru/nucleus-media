@@ -78,7 +78,7 @@ public final class S3Client implements Initializer {
                 }
             }
         } catch (Exception e) {
-            LOG.error("Upload failed : " + e);
+            LOG.error("Upload failed : ", e);
             UploadValidationUtils.rejectOnS3Error(e, response, LOG);
             return response;
         }
