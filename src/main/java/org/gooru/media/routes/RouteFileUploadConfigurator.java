@@ -41,7 +41,7 @@ public class RouteFileUploadConfigurator implements RouteConfigurator {
                 }
                 future.complete(response);
             } catch (Exception e) {
-                LOG.error("Un handled exception : " + e);
+                LOG.error("Un handled exception : ", e);
                 context.fail(e);
             }
         }, res -> RouteResponseUtility.responseHandler(context, res, LOG)));
